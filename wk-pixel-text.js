@@ -36,22 +36,10 @@
     };
   }
 
-  // 3. iOS Safari momentum kaydırma sonrası scroll-bağlı animasyonları tazele
-  let momentumTimer = 0;
-  const nudgeScroll = () => {
-    clearTimeout(momentumTimer);
-    momentumTimer = setTimeout(() => {
-      window.dispatchEvent(new Event('scroll'));
-    }, 120);
-  };
-  window.addEventListener('touchend', nudgeScroll, { passive: true });
+  // 3. Yalnızca ekran döndürüldüğünde ölçümü tazele (touchend/visualViewport'ta sahte scroll titreme yapar!)
   window.addEventListener('orientationchange', () => setTimeout(() => {
     window.dispatchEvent(new Event('resize'));
-    window.dispatchEvent(new Event('scroll'));
-  }, 250));
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', nudgeScroll, { passive: true });
-  }
+  }, 260));
 
   /* ----------------------------------------------------------
      4. Safari / iOS Pikselli Geist Serif Başlık Çizicisi
@@ -67,7 +55,6 @@
     '.proof dd',
     '.seq-line',
     '.lab3d-specs h3',
-    '.fs-who',
     '.fold-q',
   ];
 

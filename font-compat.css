@@ -102,20 +102,22 @@ html.wk .wk-px-canvas {
 
 /* ==========================================================
    Safari / iOS WebKit (html.wk) Animasyon & Sticky Uyumluluğu
+   NOT: Sticky bölümlerde 100dvh yerine 100svh kullanılır!
+   (100dvh Safari adres çubuğu hareket ettikçe boy değiştirip titreme yapar.)
    ========================================================== */
-@supports (height: 100dvh) {
+@supports (height: 100svh) {
   html.wk .hero,
   html.wk .hero-grid,
   html.wk .wheel-sticky,
   html.wk .log-sticky {
-    min-height: 100dvh;
+    min-height: 100svh;
   }
 
   html.wk .stack-title,
   html.wk #warp,
   html.wk #click-fx,
   html.wk .cursor-trail {
-    height: 100dvh;
+    height: 100lvh;
   }
 
   html.wk #ambient {
@@ -146,6 +148,37 @@ html.wk .p-lay {
   will-change: transform;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
+}
+
+/* Safari'de #kayit ("Kod dışında da bir geçmişim var") kaydırırken titremesini önle:
+   - Sticky içeriği merkeze yaslamak yerine üstten sabit hizala (toolbar hareketinde zıplamaz)
+   - .fs-img üstündeki filter:saturate/brightness değişimi yerine GPU opacity kullan */
+html.wk .log-sticky {
+  justify-content: flex-start;
+  padding-top: clamp(5rem, 10vh, 7.5rem);
+  padding-bottom: 2rem;
+}
+
+html.wk .fs-view {
+  contain: layout style;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+html.wk .fs-tile {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+html.wk .fs-tile .fs-img {
+  filter: none !important;
+  opacity: 0.72;
+  transition: opacity 0.25s ease;
+}
+
+html.wk .fs-tile.on .fs-img,
+html.wk .fs-tile:hover .fs-img {
+  opacity: 1;
 }
 
 /* Safari'de position:sticky kart üstünde dinamik filter:brightness() donma yapıyor */
