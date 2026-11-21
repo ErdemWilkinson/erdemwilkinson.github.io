@@ -71,6 +71,7 @@ html.wk .wk-px-canvas {
 
 /* 1. iOS Safari adres çubuğu yüzünden 100vh taşmasını 100dvh / 100lvh ile düzelt */
 @supports (height: 100dvh) {
+
   html.wk .hero,
   html.wk .hero-grid,
   html.wk .wheel-sticky,
@@ -101,6 +102,7 @@ html.wk .log-sticky {
 }
 
 @supports (overflow: clip) {
+
   html.wk .wheel-sticky,
   html.wk .log-sticky {
     overflow: clip;
@@ -125,9 +127,12 @@ html.wk .card {
 
 /* Safari'de margin-top animasyonu yerine GPU transform zıplaması */
 @keyframes wk-hero-bob {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translate(-50%, -100%);
   }
+
   50% {
     transform: translate(-50%, calc(-100% - 5px));
   }
@@ -150,11 +155,13 @@ html.wk .p-fg {
     clip-path: inset(0 0 0 0);
     opacity: 1;
   }
+
   60% {
     -webkit-clip-path: inset(47% 0 47% 0);
     clip-path: inset(47% 0 47% 0);
     opacity: 1;
   }
+
   100% {
     -webkit-clip-path: inset(50% 50% 50% 50%);
     clip-path: inset(50% 50% 50% 50%);
