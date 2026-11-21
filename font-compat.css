@@ -1,7 +1,10 @@
 /* ==========================================================
-   Bağımsız Font Uyumluluk Eklentisi (Safari / iOS / Mobil Chrome)
-   Ana koda dokunmadan tüm ağırlıklarda (100-900) yerel fontları
-   garantiler ve Pixelify Sans'ı dış CDN yerine yerelden sunar.
+   Bağımsız Safari / iOS / Mobil Uyumluluk Eklentisi
+   Ana koda dokunmadan:
+   1) Tüm ağırlıklarda (100-900) yerel Geist Serif, Geist Pixel
+      ve yerel Pixelify Sans fontlarını garantiler.
+   2) Safari / iOS WebKit animasyonlarını ve sticky bölümleri düzeltir.
+   3) Mobilde #surec, #kayit ve .seq-line taşmalarını ekrana sığdırır.
    ========================================================== */
 
 @font-face {
@@ -42,36 +45,23 @@
     U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
-/* Safari / iOS WebKit (html.wk) için yerel piksel başlık katmanı */
-html.wk .wk-px-host {
-  position: relative;
-  color: transparent !important;
-  -webkit-text-fill-color: transparent !important;
+/* ==========================================================
+   Kapanış sloganı: YAZ. kelimesi her koşulda turuncu/kırmızı yansın
+   ========================================================== */
+.seq-line.on em {
+  color: var(--hot) !important;
 }
 
-html.wk .wk-px-host * {
-  color: transparent !important;
-  -webkit-text-fill-color: transparent !important;
-}
-
-html.wk .wk-px-canvas {
-  position: absolute;
-  left: 0;
-  top: 0;
-  pointer-events: none;
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
+@media (prefers-reduced-motion: reduce) {
+  .seq-line em {
+    color: var(--hot) !important;
+  }
 }
 
 /* ==========================================================
    Safari / iOS WebKit (html.wk) Animasyon & Sticky Uyumluluğu
-   Ana styles.css dosyasına dokunmadan WebKit hatalarını giderir
    ========================================================== */
-
-/* 1. iOS Safari adres çubuğu yüzünden 100vh taşmasını 100dvh / 100lvh ile düzelt */
 @supports (height: 100dvh) {
-
   html.wk .hero,
   html.wk .hero-grid,
   html.wk .wheel-sticky,
@@ -92,7 +82,6 @@ html.wk .wk-px-canvas {
   }
 }
 
-/* 2. Safari position:sticky + overflow:hidden çakışmasını gider */
 html.wk .stack-title,
 html.wk .card,
 html.wk .wheel-sticky,
@@ -102,14 +91,12 @@ html.wk .log-sticky {
 }
 
 @supports (overflow: clip) {
-
   html.wk .wheel-sticky,
   html.wk .log-sticky {
     overflow: clip;
   }
 }
 
-/* 3. Kart istifi, süreç haritası, yatay geçmiş ve portre animasyonlarını Safari GPU katmanına al */
 html.wk .card,
 html.wk .wheel-ring,
 html.wk .fs-track,
@@ -119,7 +106,7 @@ html.wk .p-lay {
   backface-visibility: hidden;
 }
 
-/* Safari'de position:sticky kart üstünde dinamik filter:brightness() takılma/kaybolma yapıyor */
+/* Safari'de position:sticky kart üstünde dinamik filter:brightness() donma yapıyor */
 html.wk .card {
   filter: none !important;
   opacity: calc(1 - var(--p) * 0.22);
@@ -127,12 +114,9 @@ html.wk .card {
 
 /* Safari'de margin-top animasyonu yerine GPU transform zıplaması */
 @keyframes wk-hero-bob {
-
-  0%,
-  100% {
+  0%, 100% {
     transform: translate(-50%, -100%);
   }
-
   50% {
     transform: translate(-50%, calc(-100% - 5px));
   }
@@ -142,12 +126,6 @@ html.wk .wheel-hero {
   animation: wk-hero-bob 0.7s steps(2) infinite;
 }
 
-/* Safari'de portre drop-shadow animasyon titremesini yumuşat */
-html.wk .p-fg {
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);
-}
-
 /* Safari'de açılış crt-off animasyonu için -webkit-clip-path desteği */
 @keyframes wk-crt-off {
   0% {
@@ -155,13 +133,11 @@ html.wk .p-fg {
     clip-path: inset(0 0 0 0);
     opacity: 1;
   }
-
   60% {
     -webkit-clip-path: inset(47% 0 47% 0);
     clip-path: inset(47% 0 47% 0);
     opacity: 1;
   }
-
   100% {
     -webkit-clip-path: inset(50% 50% 50% 50%);
     clip-path: inset(50% 50% 50% 50%);
@@ -173,7 +149,11 @@ html.wk #boot.out {
   animation-name: wk-crt-off;
 }
 
-/* 4. Safari'de piksel canvas'ların bulanıklaşmasını önle */
+html.wk .p-fg {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
 html.wk canvas.sprite,
 html.wk #wordmark,
 html.wk #scan-canvas,
@@ -182,4 +162,92 @@ html.wk #forest,
 html.wk .lab3d-viewport canvas {
   image-rendering: -webkit-optimize-contrast;
   image-rendering: pixelated;
+}
+
+/* ==========================================================
+   Mobil / iPhone Ekranına Tam Sığdırma (#surec, .seq, başlıklar)
+   ========================================================== */
+@media (max-width: 760px) {
+  body {
+    overflow-x: clip;
+  }
+
+  h1,
+  h2,
+  .stack-title h2,
+  .wheel-head h2 {
+    max-width: 100%;
+    overflow-wrap: break-word;
+  }
+
+  /* 04 / Süreç ("Bir modeli karta nasıl indiriyorum") tek telefon ekranına tam sığsın */
+  .wheel-sticky {
+    justify-content: flex-start;
+    padding: 4.5rem 0 1.25rem;
+  }
+
+  .wheel-head {
+    margin-bottom: 0.75rem;
+  }
+
+  .wheel-head h2 {
+    font-size: clamp(1.45rem, 6.2vw, 2rem);
+    line-height: 1.08;
+  }
+
+  .wheel-layout {
+    gap: 0.9rem;
+  }
+
+  .wheel {
+    width: min(330px, 88vw);
+    aspect-ratio: 1 / 0.56;
+  }
+
+  .wheel .wheel-label {
+    width: 56px;
+    height: 46px;
+    font-size: 0.54rem;
+  }
+
+  .wheel .wheel-label b {
+    font-size: 0.95rem;
+  }
+
+  .wheel .wheel-hero {
+    width: 26px;
+    height: 26px;
+    margin-top: -34px;
+  }
+
+  .wheel-detail .wheel-detail-body {
+    padding: 0.85rem 0.95rem !important;
+  }
+
+  .wheel-detail h3 {
+    font-size: clamp(1.15rem, 5vw, 1.45rem);
+    margin: 0.35rem 0;
+  }
+
+  .wd-desc {
+    font-size: 0.84rem;
+    line-height: 1.42;
+    margin: 0.35rem 0 0.65rem;
+  }
+
+  .wd-proof {
+    padding: 0.55rem 0.7rem;
+    font-size: 0.76rem;
+  }
+
+  /* Kapanış sloganı ("ÖLÇ. BUDA. KARTA YAZ.") telefonda taşmasın */
+  .seq-line {
+    font-size: clamp(2.35rem, 11.2vw, 4rem);
+    line-height: 1.02;
+  }
+
+  /* Yatay geçmiş bölümü ekrana sığsın */
+  .log-sticky {
+    padding: 4.5rem 0 1.25rem;
+  }
 }
