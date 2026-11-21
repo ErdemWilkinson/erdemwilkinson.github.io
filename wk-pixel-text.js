@@ -135,13 +135,16 @@
   }
 
   function paintElement(el) {
-    // Mevcut canvas'ı gizleyip gerçek renk & metrikleri oku
+    // Mevcut canvas'ı gizleyip CSS transition olmadan gerçek hedef rengi & metrikleri oku
     const hadHost = el.classList.contains('wk-px-host');
+    el.classList.add('wk-px-measuring');
     if (hadHost) el.classList.remove('wk-px-host');
     const oldCv = el.querySelector(':scope > .wk-px-canvas');
     if (oldCv) oldCv.style.display = 'none';
+    void el.offsetWidth;
 
     const { hostRect, runs } = collectRuns(el);
+    el.classList.remove('wk-px-measuring');
     if (hostRect.width < 8 || hostRect.height < 8 || !runs.length) {
       if (oldCv) oldCv.remove();
       return;

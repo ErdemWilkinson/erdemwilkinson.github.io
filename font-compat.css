@@ -66,6 +66,11 @@
 }
 
 /* Safari / iOS WebKit (html.wk) için yüksek netlikli piksel başlık katmanı */
+html.wk .wk-px-measuring,
+html.wk .wk-px-measuring * {
+  transition: none !important;
+}
+
 html.wk .wk-px-host {
   position: relative;
   color: transparent !important;
