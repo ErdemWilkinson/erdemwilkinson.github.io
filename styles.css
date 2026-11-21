@@ -4727,3 +4727,18 @@ summary *,
     top: 5.1rem;
   }
 }
+
+/* Safari / iOS (WebKit): feTile'lı piksel filtresi başlıkları siliyor, bu tarayıcılarda düz yazı */
+html.wk h1,
+html.wk h2,
+html.wk .card h3,
+html.wk .wheel-detail h3,
+html.wk .proof dd,
+html.wk .seq-line,
+html.wk .note-q,
+html.wk .lab3d-specs h3,
+html.wk .note-answer h3,
+html.wk .fs-who,
+html.wk .fold-q {
+  filter: none !important;
+}
