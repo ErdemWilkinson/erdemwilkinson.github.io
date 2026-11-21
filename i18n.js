@@ -16,8 +16,8 @@
     'E-posta gönder': 'Send email',
     'E-posta': 'Email',
     'Junior yazılım geliştirici · staj ve freelance işlere açığım': 'Junior software developer · open to internships and freelance work',
-    'Yapay zekâyı': 'I fit AI',
-    'mikrodenetleyiciye sığdırıyorum.': 'onto microcontrollers.',
+    'Gömülü sistemlerde': 'I build AI',
+    'yapay zekâ geliştiriyorum.': 'for embedded systems.',
     'Ben Erdem. ESP32 için C ile yazılım yazıyor ve tam int8 modeller eğitiyorum. Web ve mobilde TypeScript, React ve Kotlin kullanıyorum. Aşağıda projelerimi, ölçtüğüm sayıları ve henüz denemediğim şeyleri bulabilirsin.':
       "I'm Erdem. I write C software for the ESP32 and train full-int8 models. On web and mobile I use TypeScript, React and Kotlin. Below you'll find my projects, the numbers I measured, and the things I haven't tried yet.",
     'İşlere bak ↓': 'See my work ↓',
