@@ -65,6 +65,28 @@
   --pix: 'Pixelify Local', 'Pixelify Sans', 'Geist Pixel', monospace;
 }
 
+/* Safari / iOS WebKit (html.wk) için yüksek netlikli piksel başlık katmanı */
+html.wk .wk-px-host {
+  position: relative;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+html.wk .wk-px-host * {
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+html.wk .wk-px-canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
 /* ==========================================================
    Kapanış sloganı: YAZ. kelimesi her koşulda turuncu/kırmızı yansın
    ========================================================== */
@@ -189,19 +211,12 @@ html.wk .lab3d-viewport canvas {
    NOT: body'ye overflow-x:clip VERİLMEZ (Safari'de sticky'yi bozar!)
    ========================================================== */
 @media (max-width: 760px) {
-  /* Küçük mobil başlıklarda 3-5px SVG piksel filtresi harfleri eritip okunmaz yapıyor */
-  h1,
-  h2,
-  .card h3,
-  .wheel-detail h3,
-  .proof dd,
-  .seq-line,
-  .note-q,
-  .lab3d-specs h3,
-  .note-answer h3,
-  .fs-who,
-  .fold-q {
-    filter: none !important;
+  /* Mobil Chrome/Android'de büyük 4-5px filtre yerine keskin ve okunaklı 2px piksel filtresi kullan */
+  html:not(.wk) h1,
+  html:not(.wk) h2,
+  html:not(.wk) .seq-line,
+  html:not(.wk) .proof dd {
+    filter: url(#px2);
   }
 
   h1,
