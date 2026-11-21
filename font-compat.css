@@ -62,6 +62,7 @@
    Safari / iOS WebKit (html.wk) Animasyon & Sticky Uyumluluğu
    ========================================================== */
 @supports (height: 100dvh) {
+
   html.wk .hero,
   html.wk .hero-grid,
   html.wk .wheel-sticky,
@@ -91,6 +92,7 @@ html.wk .log-sticky {
 }
 
 @supports (overflow: clip) {
+
   html.wk .wheel-sticky,
   html.wk .log-sticky {
     overflow: clip;
@@ -114,9 +116,12 @@ html.wk .card {
 
 /* Safari'de margin-top animasyonu yerine GPU transform zıplaması */
 @keyframes wk-hero-bob {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translate(-50%, -100%);
   }
+
   50% {
     transform: translate(-50%, calc(-100% - 5px));
   }
@@ -133,11 +138,13 @@ html.wk .wheel-hero {
     clip-path: inset(0 0 0 0);
     opacity: 1;
   }
+
   60% {
     -webkit-clip-path: inset(47% 0 47% 0);
     clip-path: inset(47% 0 47% 0);
     opacity: 1;
   }
+
   100% {
     -webkit-clip-path: inset(50% 50% 50% 50%);
     clip-path: inset(50% 50% 50% 50%);
@@ -180,7 +187,33 @@ html.wk .lab3d-viewport canvas {
     overflow-wrap: break-word;
   }
 
-  /* 04 / Süreç ("Bir modeli karta nasıl indiriyorum") tek telefon ekranına tam sığsın */
+  /* 1. Hero h1: "mikrodenetleyiciye" kelimesi 375-390px iPhone'da sağdan taşmasın */
+  .hero h1,
+  h1 {
+    font-size: clamp(1.95rem, 8vw, 3rem);
+    line-height: 1.04;
+  }
+
+  /* 2. Proje kartları (#isler): iPhone'da ekran boyundan uzun kartlar sticky olunca alt linkleri örtmesin */
+  .stack {
+    margin-top: 0;
+    gap: 1.35rem;
+  }
+
+  .stack .card,
+  html.wk .stack .card {
+    position: relative;
+    top: auto;
+    transform: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+  }
+
+  .stack .card > .win-bar .win-title {
+    opacity: 1 !important;
+  }
+
+  /* 3. 04 / Süreç ("Bir modeli karta nasıl indiriyorum") tek telefon ekranına tam sığsın & scroll tuzağı olmasın */
   .wheel-sticky {
     justify-content: flex-start;
     padding: 4.5rem 0 1.25rem;
@@ -202,6 +235,7 @@ html.wk .lab3d-viewport canvas {
   .wheel {
     width: min(330px, 88vw);
     aspect-ratio: 1 / 0.56;
+    touch-action: pan-y;
   }
 
   .wheel .wheel-label {
@@ -240,6 +274,28 @@ html.wk .lab3d-viewport canvas {
     font-size: 0.76rem;
   }
 
+  /* 4. 3D kontrol düğmeleri & ok etiketleri dar ekranda sıkışıp çakışmasın */
+  .lab3d-controls {
+    gap: 0.4rem;
+    padding: 0.6rem;
+  }
+
+  .lab3d-btn {
+    padding: 0.42rem 0.6rem;
+    font-size: 0.72rem;
+  }
+
+  .lab3d-tag {
+    max-width: 44%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .lab3d-tag b {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   /* Kapanış sloganı ("ÖLÇ. BUDA. KARTA YAZ.") telefonda taşmasın */
   .seq-line {
     font-size: clamp(2.35rem, 11.2vw, 4rem);
@@ -249,5 +305,21 @@ html.wk .lab3d-viewport canvas {
   /* Yatay geçmiş bölümü ekrana sığsın */
   .log-sticky {
     padding: 4.5rem 0 1.25rem;
+  }
+
+  /* 5. iPhone çentik & alt Home çizgisi güvenli alan (safe-area) boşlukları */
+  .nav {
+    top: max(0.8rem, env(safe-area-inset-top));
+  }
+
+  .foot-row {
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 560px) {
+  /* Dar telefonda CRT pencere çubuğundaki menü kelimeleri başlığı sıkıştırmasın */
+  .scan .win-bar .menu {
+    display: none;
   }
 }
