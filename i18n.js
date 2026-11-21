@@ -434,8 +434,8 @@
   try {
     const q = new URLSearchParams(location.search).get('lang');
     const saved = localStorage.getItem(KEY);
-    lang = q === 'en' || q === 'tr' ? q : saved === 'en' || saved === 'tr' ? saved : /^tr\b/i.test(navigator.language || '') ? 'tr' : 'en';
-  } catch (e) { lang = 'tr'; }
+    lang = q === 'en' || q === 'tr' ? q : saved === 'en' || saved === 'tr' ? saved : 'en';
+  } catch (e) { lang = 'en'; }
 
   const orig = new WeakMap(); // düğüm -> {tr, en}
   const origAttr = new WeakMap(); // eleman -> {attr: {tr, en}}
