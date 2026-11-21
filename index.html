@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Erdem Aslan · Gömülü Sistemler, TinyML, Web ve Mobil</title>
+<meta name="description" content="Erdem Aslan: ESP32 için C (ESP-IDF) yazılımı, mikrodenetleyicide çalışan tam int8 modeller, web ve mobil uygulamalar. Ölçülen ve ölçülmeyen her şey açıkça yazılı.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Erdem Aslan · Gömülü Sistemler, TinyML, Web ve Mobil">
+<meta property="og:description" content="ESP32 için C (ESP-IDF), mikrodenetleyicide çalışan tam int8 TinyML modelleri, web ve mobil projeler.">
+<meta property="og:url" content="https://erdemwilkinson.github.io/">
+<meta property="og:image" content="https://erdemwilkinson.github.io/img/logo-on.webp">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Erdem Aslan · Gömülü Sistemler, TinyML, Web ve Mobil">
+<meta name="twitter:description" content="ESP32 için C (ESP-IDF), mikrodenetleyicide çalışan tam int8 TinyML modelleri, web ve mobil projeler.">
+<meta name="twitter:image" content="https://erdemwilkinson.github.io/img/logo-on.webp">
+<link rel="canonical" href="https://erdemwilkinson.github.io/">
+<meta name="theme-color" content="#0b0907">
+<link rel="icon" type="image/png" href="img/logo-nav.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+<link rel="preload" href="fonts/GeistSerif-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/GeistPixel-Square.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="styles.css">
+<noscript><style>#boot{display:none}body.is-loading{overflow:auto}</style></noscript>
+</head>
+<body class="is-loading">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><filter id="px2" x="-2%" y="-12%" width="104%" height="124%" color-interpolation-filters="sRGB"><feFlood x="1" y="1" width="1" height="1"/><feComposite width="2" height="2"/><feTile result="t"/><feComposite in="SourceGraphic" in2="t" operator="in"/><feMorphology operator="dilate" radius="1.0"/><feComponentTransfer><feFuncA type="discrete" tableValues="0 1 1 1 1"/></feComponentTransfer></filter><filter id="px3" x="-2%" y="-12%" width="104%" height="124%" color-interpolation-filters="sRGB"><feFlood x="1" y="1" width="1" height="1"/><feComposite width="3" height="3"/><feTile result="t"/><feComposite in="SourceGraphic" in2="t" operator="in"/><feMorphology operator="dilate" radius="1.5"/><feComponentTransfer><feFuncA type="discrete" tableValues="0 1 1 1 1"/></feComponentTransfer></filter><filter id="px4" x="-2%" y="-12%" width="104%" height="124%" color-interpolation-filters="sRGB"><feFlood x="2" y="2" width="1" height="1"/><feComposite width="4" height="4"/><feTile result="t"/><feComposite in="SourceGraphic" in2="t" operator="in"/><feMorphology operator="dilate" radius="2.0"/><feComponentTransfer><feFuncA type="discrete" tableValues="0 1 1 1 1"/></feComponentTransfer></filter><filter id="px5" x="-2%" y="-12%" width="104%" height="124%" color-interpolation-filters="sRGB"><feFlood x="2" y="2" width="1" height="1"/><feComposite width="5" height="5"/><feTile result="t"/><feComposite in="SourceGraphic" in2="t" operator="in"/><feMorphology operator="dilate" radius="2.5"/><feComponentTransfer><feFuncA type="discrete" tableValues="0 1 1 1 1"/></feComponentTransfer></filter></defs></svg>
+
+<!-- Açılış -->
+<div id="boot" aria-hidden="true">
+</div>
+
+<header class="nav">
+  <nav class="nav-links" aria-label="Bölümler">
+    <a href="#donanim3d">3D model</a>
+    <a href="#isler">İşler</a>
+    <a href="#surec">Süreç</a>
+    <a href="#sigar">Disket</a>
+    <a href="#kayit">Geçmiş</a>
+  </nav>
+  <a href="#top" class="nav-mark" aria-label="Erdem Aslan, başa dön">
+    <img class="nav-logo" src="img/logo-nav.png" alt="" width="38" height="38" decoding="async">
+  </a>
+  <div class="nav-right">
+    <a class="nav-gh" href="https://github.com/ErdemWilkinson" target="_blank" rel="noopener">GitHub</a>
+    <a class="nav-cta" href="mailto:erdemaslan473@gmail.com">E-posta gönder</a>
+    <button type="button" id="nav-burger" class="nav-burger" aria-label="Menü" aria-expanded="false" aria-controls="nav-drawer">☰</button>
+  </div>
+</header>
+<nav id="nav-drawer" class="nav-drawer" aria-label="Bölümler" hidden>
+  <a href="#donanim3d">3D model</a>
+  <a href="#isler">İşler</a>
+  <a href="#surec">Süreç</a>
+  <a href="#sigar">Disket</a>
+  <a href="#kayit">Geçmiş</a>
+  <a href="https://github.com/ErdemWilkinson" target="_blank" rel="noopener">GitHub ↗</a>
+</nav>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <canvas id="field" class="field" aria-hidden="true"></canvas>
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <p class="status"><span class="dot"></span>Junior yazılım geliştirici · staj ve freelance işlere açığım</p>
+        <h1>Yapay zekâyı<br><span class="dim">mikrodenetleyiciye sığdırıyorum.</span></h1>
+        <p class="lede">Ben Erdem. ESP32 için C ile yazılım yazıyor ve tam int8 modeller eğitiyorum. Web ve mobilde TypeScript, React ve Kotlin kullanıyorum. Aşağıda projelerimi, ölçtüğüm sayıları ve henüz denemediğim şeyleri bulabilirsin.</p>
+        <div class="hero-actions">
+          <a class="btn btn-hot" href="#isler">İşlere bak ↓</a>
+          <a class="btn btn-line" href="https://github.com/ErdemWilkinson" target="_blank" rel="noopener">GitHub ↗</a>
+          <a class="btn btn-line" href="https://huggingface.co/inviolus" target="_blank" rel="noopener">Hugging Face ↗</a>
+        </div>
+      </div>
+
+    </div>
+    <div class="crt-stage">
+      <canvas id="scene" class="scene" aria-hidden="true"></canvas>
+      <div class="crt">
+        <div class="crt-bezel">
+          <div class="crt-screen">
+            <nav class="desk-icons desk-left" aria-label="Kısayollar" data-icons="cube:3D model:#donanim3d|folder:İşler:#isler|chip:Süreç:#surec"></nav>
+            <figure class="scan win">
+        <div class="win-bar"><i></i><i></i><i></i><span class="menu"><span>Dosya</span><span>Düzen</span><span>Görünüm</span><span>Tara</span></span><span class="win-title">voxhod_v3.tflite</span><span id="scan-count" class="count">0/0 insan</span></div>
+        <div class="canvas-wrap"><canvas id="scan-canvas" aria-label="Drone görüntüsünde insan arama canlandırması"></canvas></div>
+        <div class="scan-controls">
+          <button id="scan-auto" class="chip-btn" type="button">▶ otomatik tara</button>
+          <button id="scan-reset" class="chip-btn" type="button">↻ yeni arazi</button>
+          <span id="scan-status" class="scan-status">Bir karonun üstünde dur.</span>
+        </div>
+        <figcaption>197 KB · int8 · 24 karo. Bu bir simülasyon ve hedefleri şaka olsun diye böyle çizdim: kişiyi bulma olasılığı (%83,9) ve karo başına yanlış alarm (0,35) VoxHOD v3'ün HERIDAL test sonuçlarından, karo süresi (321 ms) ESP32-P4 ölçümünden alındı.</figcaption>
+      </figure>
+            <nav class="desk-icons desk-right" aria-label="Kısayollar" data-icons="floppy:Disket:#sigar|scroll:Geçmiş:#kayit|mail:E-posta:mailto:erdemaslan473@gmail.com"></nav>
+          </div>
+          <div class="crt-plate"><span class="led"></span><span class="brand">ERDEM ASLAN</span><span class="vents"><i></i><i></i><i></i><i></i></span></div>
+        </div>
+        <div class="crt-neck"></div>
+        <div class="crt-base"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="vine-band" aria-hidden="true"><canvas></canvas></div>
+
+  <div class="proof-wrap">
+    <dl class="proof">
+      <div><dt>InviolusOCR</dt><dd>%77,3</dd><span>görülmemiş satırda tam doğru</span></div>
+      <div><dt>VoxHOD v3</dt><dd>197 KB</dd><span>int8, HERIDAL'da %83,9 kişi</span></div>
+      <div><dt>ESP32-P4</dt><dd>321 ms</dd><span>karo başına, kartta ölçüldü</span></div>
+      <div><dt>VoxHOD Nano</dt><dd>75 KB</dd><span>int8, arama-kurtarma kişi tespiti</span><span class="proof-note">dünyanın en küçük dedektörlerinden biri</span></div>
+    </dl>
+  </div>
+
+  <!-- 3D DONANIM ATÖLYESİ -->
+  <section id="donanim3d" class="lab">
+    <div class="wrap">
+      <div class="lab-head">
+        <div>
+          <p class="tag"><span>01 /</span> 3D atölye</p>
+          <h2>Dronlar ve makeshift-flipper</h2>
+        </div>
+        <div class="lab-tabs" role="tablist" aria-label="3D model seçimi">
+          <button type="button" class="lab3d-tab active" data-model="drone" role="tab" aria-selected="true"><span class="pix">01</span> VoxHOD v3 SAR Drone</button>
+          <button type="button" class="lab3d-tab" data-model="nano" role="tab" aria-selected="false"><span class="pix">02</span> VoxHOD Nano + Posibrain</button>
+          <button type="button" class="lab3d-tab" data-model="flipper" role="tab" aria-selected="false"><span class="pix">03</span> makeshift-flipper (ESP32-C6)</button>
+        </div>
+      </div>
+
+      <div class="lab3d-grid">
+        <div class="lab3d-stage win">
+          <div class="lab3d-hud">
+            <span id="lab3d-badge" class="pix">VOXHOD-P4 // QUAD-SAR</span>
+            <span class="lab3d-hint">sürükle: döndür · tekerlek: yakınlaştır</span>
+          </div>
+          <div id="lab3d-viewport" class="lab3d-viewport" aria-label="3 boyutlu etkileşimli model alanı"></div>
+          <div class="lab3d-controls">
+            <button type="button" id="lab3d-explode" class="lab3d-btn">⊞ Patlatılmış Görünüm</button>
+            <button type="button" id="lab3d-action" class="lab3d-btn">◎ Arama Konisi: AÇIK</button>
+            <button type="button" id="lab3d-callouts" class="lab3d-btn">↗ Oklar: KAPALI</button>
+            <button type="button" id="lab3d-reset" class="lab3d-btn">↻ Kamerayı Sıfırla</button>
+          </div>
+        </div>
+
+        <aside class="lab3d-specs win">
+          <p id="lab3d-kicker" class="tag">HAVA ARACI · TINYML PAYLOAD</p>
+          <h3 id="lab3d-title">VoxHOD / Posibrain SAR Drone</h3>
+          <p id="lab3d-desc" class="lab3d-desc">ESP32-P4 üzerinde 197 KB tam int8 kişi tespit modeli (VoxHOD v3) ve 60,8 KB arama politikası (Posibrain) taşımak üzere kurgulanmış dört pervaneli arama-kurtarma drone konsepti.</p>
+          <dl id="lab3d-dl" class="lab3d-dl"></dl>
+          <div class="lab3d-note" id="lab3d-note"></div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- İŞLER -->
+  <section id="isler" class="stack-section">
+    <div class="stack-title">
+      <p class="tag"><span>02 /</span> İşler ve ölçümler</p>
+      <h2>Ürettiğim, ölçtüğüm ve sınırlarını yazdığım projeler</h2>
+    </div>
+
+    <div class="stack">
+
+      <article class="card" style="--i:0">
+        <div class="win-bar"><i></i><i></i><i></i><span class="win-title">inviolusocr / readme</span></div>
+        <div class="card-body">
+        <header class="card-head">
+          <canvas class="sprite" data-sprite="ocr" data-scale="4"></canvas>
+          <div><p class="card-kicker">TinyML · Türkçe OCR</p><h3>InviolusOCR</h3></div>
+        </header>
+        <p class="card-lede">Tek satır basılı Türkçe metni okuyan, tam int8 evrişimli CTC tanıyıcı. Üç boyutta Hugging Face'te yayında.</p>
+        <div class="card-stats">
+          <div><b>598 · 298 · 171</b><span>KB · Base / Small / Nano</span></div>
+          <div><b>%77,3</b><span>eğitimde görülmemiş 12.093 satırda tam doğru</span></div>
+          <div><b>~420 ms</b><span>Nano, ESP32-P4'te satır başına</span></div>
+        </div>
+        <div class="ledger">
+          <div class="ok"><h4>ölçüldü</h4><ul>
+            <li>Gerçek sahne metninde (TS-TR) %56,2, basılı belge satırlarında %46,5 tam doğru.</li>
+            <li>BiLSTM yerine evrişimli çıkış: int8'e geçişteki kayıp 26–48 puandan yaklaşık 1 puana indi.</li>
+            <li>Small ve Nano, Base'den kanal budanarak elde edildi; sıfırdan eğitilen kontrolleri üç test setinde geçti (McNemar, p ≤ 0,016).</li>
+            <li>240 gerçek fotoğrafta kart ile bilgisayar arasındaki fark en fazla 1,7 puan.</li>
+          </ul></div>
+          <div class="no"><h4>sınır</h4><ul>
+            <li>Yalnızca tek satır okur; satırları sayfada bulmak ayrı bir adım.</li>
+            <li>Basılı belge satırlarında doğruluk hâlâ yarının altında.</li>
+          </ul></div>
+        </div>
+        <footer class="card-links">
+          <a href="https://github.com/ErdemWilkinson/InviolusOCR" target="_blank" rel="noopener">GitHub ↗</a>
+          <a href="https://huggingface.co/inviolus/InviolusOCR" target="_blank" rel="noopener">Model ↗</a>
+        </footer>
+      </div>
+      </article>
+
+      <article class="card" style="--i:1">
+        <div class="win-bar"><i></i><i></i><i></i><span class="win-title">voxhod / readme</span></div>
+        <div class="card-body">
+        <header class="card-head">
+          <canvas class="sprite" data-sprite="drone" data-scale="4"></canvas>
+          <div><p class="card-kicker">TinyML · Arama-kurtarma</p><h3>VoxHOD</h3></div>
+        </header>
+        <p class="card-lede">Drone görüntüsünde kişi bulan, tamamen sıfırdan kurulup eğitilmiş, çapasız (CenterNet tarzı) dedektör. Yalnızca TFLite Micro işlemleri kullanır.</p>
+        <div class="card-stats">
+          <div><b>197 KB</b><span>v3 int8 · 136.547 parametre · nano 75 KB</span></div>
+          <div><b>%83,9</b><span>HERIDAL'da (3.507 karo) bulunan kişi, karo başına 0,35 yanlış alarm</span></div>
+          <div><b>321 ms</b><span>ESP32-P4'te karo başına · nano 151 ms</span></div>
+        </div>
+        <div class="ledger">
+          <div class="ok"><h4>ölçüldü</h4><ul>
+            <li>Nicemleme farkındalıklı eğitim (QAT) ile int8 sürüm float modelden en fazla yarım puan geride.</li>
+            <li>Yayımlanan dosyalar ESP32-P4'te birebir ölçüldü.</li>
+            <li>Ticari olmayan VoxHOD-NC (v2): Türk drone görüntülerinde bulunan kişi oranı %32,9'dan %62,2'ye çıktı.</li>
+          </ul></div>
+          <div class="no"><h4>ölçülmedi / geçemedi</h4><ul>
+            <li>Henüz uçuşta denenmedi.</li>
+            <li>Başka bir kamerada (WiSARD) oran %61,3'e düşüyor.</li>
+            <li>Damıtma (8'e karşı 8 koşu) ve SARD verisi eşiği geçemedi, yayımlanmadı.</li>
+          </ul></div>
+        </div>
+        <footer class="card-links">
+          <a href="https://github.com/ErdemWilkinson/VoxHOD" target="_blank" rel="noopener">GitHub ↗</a>
+          <a href="https://huggingface.co/inviolus/VoxHOD" target="_blank" rel="noopener">Model ↗</a>
+          <a href="https://github.com/ErdemWilkinson/VoxHOD-NC" target="_blank" rel="noopener">VoxHOD-NC ↗</a>
+        </footer>
+      </div>
+      </article>
+
+      <article class="card" style="--i:2">
+        <div class="win-bar"><i></i><i></i><i></i><span class="win-title">voxscout / readme</span></div>
+        <div class="card-body">
+        <header class="card-head">
+          <canvas class="sprite" data-sprite="eye" data-scale="4"></canvas>
+          <div><p class="card-kicker">Yer istasyonu · İkinci aşama</p><h3>VoxScout</h3></div>
+        </header>
+        <p class="card-lede">VoxHOD'un büyük kardeşi. Google'ın EfficientNet-B0 gövdesine (ImageNet) VoxHOD'un tespit başlığı eklenip tüm ağ HERIDAL ile eğitildi. Mikrodenetleyici için değil.</p>
+        <div class="card-stats">
+          <div><b>5,2 MB</b><span>int8 · 4,4 milyon parametre</span></div>
+          <div><b>4–5×</b><span>aynı yakalama oranında daha az yanlış alarm</span></div>
+          <div><b>?</b><span>cihaz hızı henüz ölçülmedi</span></div>
+        </div>
+        <div class="ledger">
+          <div class="ok"><h4>ölçüldü</h4><ul>
+            <li>Aynı veriyle eğitilmiş VoxHOD modellerine göre 4–5 kat daha az yanlış alarm (int8).</li>
+            <li>Kazancın kaynağı boyut değil, ImageNet ön eğitimi.</li>
+          </ul></div>
+          <div class="no"><h4>ölçülmedi</h4><ul>
+            <li>Cihazdaki hızı.</li>
+            <li>Tek eğitim koşusu; tekrar sayısı yok.</li>
+          </ul></div>
+        </div>
+        <footer class="card-links">
+          <a href="https://github.com/ErdemWilkinson/VoxScout" target="_blank" rel="noopener">GitHub ↗</a>
+          <a href="https://huggingface.co/inviolus/VoxScout" target="_blank" rel="noopener">Model ↗</a>
+        </footer>
+      </div>
+      </article>
+
+      <article class="card" style="--i:3">
+        <div class="win-bar"><i></i><i></i><i></i><span class="win-title">makeshift-flipper / readme</span></div>
+        <div class="card-body">
+        <header class="card-head">
+          <canvas class="sprite" data-sprite="handheld" data-scale="4"></canvas>
+          <div><p class="card-kicker">C · ESP-IDF · ESP32-C6</p><h3>makeshift-flipper</h3></div>
+        </header>
+        <p class="card-lede">Tek bir ESP32-C6 üzerinde Flipper Zero benzeri el cihazı. OLED menü arayüzü, Wi-Fi ve BLE araçları, RFID ve IR sürücüleri.</p>
+        <div class="card-stats">
+          <div><b>1 çip</b><span>ESP32-C6, tamamı C ile</span></div>
+          <div><b>Wi-Fi · BLE</b><span>tarama, erişim noktası, pasif izleme, kanal haritası, BLE radarı</span></div>
+          <div><b>CI</b><span>her push'ta derleme ve mantık testleri</span></div>
+        </div>
+        <div class="ledger">
+          <div class="ok"><h4>donanımda çalışıyor</h4><ul>
+            <li>Ekran, tuşlar, menüler ve çip üzerindeki Wi-Fi ve BLE araçları gerçek donanımda.</li>
+            <li>GitHub Actions her push'ta yazılımı ESP32-C6 için derliyor, bilgisayar tarafındaki mantık testlerini çalıştırıyor.</li>
+          </ul></div>
+          <div class="no"><h4>doğrulanmadı</h4><ul>
+            <li>RFID ve IR sürücüleri yazıldı, monte edilmiş donanımda doğrulanmadı.</li>
+            <li>Yalnızca 2,4 GHz; C6'da 5 GHz radyo yok.</li>
+          </ul></div>
+        </div>
+        <footer class="card-links">
+          <a href="https://github.com/ErdemWilkinson/makeshift-flipper" target="_blank" rel="noopener">GitHub ↗</a>
+        </footer>
+      </div>
+      </article>
+
+      <article class="card" style="--i:4">
+        <div class="win-bar"><i></i><i></i><i></i><span class="win-title">neshter / readme</span></div>
+        <div class="card-body">
+        <header class="card-head">
+          <canvas class="sprite" data-sprite="scalpel" data-scale="4"></canvas>
+          <div><p class="card-kicker">Yerel LLM · Yorumlanabilirlik</p><h3>Neshter</h3></div>
+        </header>
+        <p class="card-lede">Bilgisayarındaki dil modelini yükler; hangi attention head'in ve davranış yönünün ne yaptığını gösterir, seçtiğin parçaları ölçüp susturur ve sonucu yeni bir model dosyası olarak kaydeder. Bulut API'si, hesap ve telemetri yok.</p>
+        <div class="card-stats">
+          <div><b>%48 → %20</b><span>iki head kesilince " Paris" olasılığı (SmolLM2-135M, CPU)</span></div>
+          <div><b>≤ 8B</b><span>Llama, Qwen2 ve Gemma2 aileleri</span></div>
+          <div><b>0</b><span>bulut çağrısı · telemetri</span></div>
+        </div>
+        <div class="ledger">
+          <div class="ok"><h4>doğrulandı</h4><ul>
+            <li>Head ablation ve davranış yönü ortogonalizasyonu; tensör şekilleri korunur, çıktı GGUF uyumlu.</li>
+            <li>Gerçek ağırlıklarda: Qwen2.5-0.5B ve SmolLM2-135M.</li>
+            <li>Android uygulaması modeli cihazda çalıştırır (llama.cpp, GGUF), sunucusuz.</li>
+          </ul></div>
+          <div class="no"><h4>yok</h4><ul>
+            <li>Yapısal budama v0.1'de yok.</li>
+            <li>Diğer mimariler reddedilir.</li>
+          </ul></div>
+        </div>
+        <footer class="card-links">
+          <a href="https://github.com/ErdemWilkinson/neshter" target="_blank" rel="noopener">GitHub ↗</a>
+        </footer>
+      </div>
+      </article>
+
+      <article class="card" style="--i:5">
+        <div class="win-bar"><i></i><i></i><i></i><span class="win-title">posibrain / readme</span></div>
+        <div class="card-body">
+        <header class="card-head">
+          <canvas class="sprite" data-sprite="brain" data-scale="4"></canvas>
+          <div><p class="card-kicker">Pekiştirmeli öğrenme · Simülasyon</p><h3>Posibrain</h3></div>
+        </header>
+        <p class="card-lede">Bir kurtarma drone'u için arama beyni. İnsanın yerini bilmeden harita taramayı sıfır ağırlıktan, hızlı ve görselsiz bir simülasyonda öğreniyor; sonra int8'e nicemleniyor.</p>
+        <div class="card-stats">
+          <div><b>60,8 KB</b><span>int8 · 52 bin parametre</span></div>
+          <div><b>21,8 KB</b><span>yarım genişlik, elle yazılmış kuralla başa baş</span></div>
+          <div><b>1 km</b><span>tek dronda en iyi kuralı küçük farkla geçti</span></div>
+        </div>
+        <div class="ledger">
+          <div class="ok"><h4>sonuç</h4><ul>
+            <li>int8 boyutları gerçek dosya boyutları.</li>
+            <li>Öğrenen ajan, en iyi elle yazılmış kuralı (yüksek irtifada tara) simülasyonda küçük bir farkla geçti.</li>
+          </ul></div>
+          <div class="no"><h4>başarısız / ölçülmedi</h4><ul>
+            <li>Her şey simülasyon: drone'da ya da mikrodenetleyicide hiç çalışmadı.</li>
+            <li>Çoklu dron, başarı olasılığı head'i ve budama denemeleri başarısız ya da kötü çıktı.</li>
+          </ul></div>
+        </div>
+        <footer class="card-links">
+          <a href="https://github.com/ErdemWilkinson/Posibrain" target="_blank" rel="noopener">GitHub ↗</a>
+        </footer>
+      </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- DİĞER İŞLER -->
+  <section class="others">
+    <div class="wrap">
+      <div class="others-head">
+        <p class="tag"><span>03 /</span> Diğer</p>
+        <h2>Diğer projeler</h2>
+        <p class="lede-sm">Küçük ama bitmiş sistemler.</p>
+      </div>
+      <ul class="others-list">
+      <li><a href="https://github.com/ErdemWilkinson/deneysel_teknik_destek" target="_blank" rel="noopener">
+        <span class="o-arrow">↳</span><span class="o-name">deneysel_teknik_destek</span>
+        <span class="o-desc">Belediye BT teknisyenleri için USB destek terminali. ESP32-P4 seri bağlantıyla dinleyiciye sinyal gönderir; DeepSeek ajanı yalnızca beyaz listedeki araçları çağırır ve bir şey değiştirmeden önce onay ister.</span>
+        <span class="o-tech">Python · ESP32-P4</span></a></li>
+      <li><a href="https://erdemwilkinson.github.io/evosim/" target="_blank" rel="noopener">
+        <span class="o-arrow">↳</span><span class="o-name">evosim <em>oyna</em></span>
+        <span class="o-desc">Gezegen ölçeğinde evrim simülasyonu. Her tohum kendi kimyasına sahip bir gezegen üretir; 38 organ tipine sahip canlılar mutasyon ve seçilimle evrimleşir. Android sürümü kapalı testte.</span>
+        <span class="o-tech">TypeScript · Canvas 2D · Web Worker</span></a></li>
+      <li><a href="https://github.com/ErdemWilkinson/Frp_deneysel" target="_blank" rel="noopener">
+        <span class="o-arrow">↳</span><span class="o-name">Açık Masa</span>
+        <span class="o-desc">Bir DM ile bir oyuncu için çevrim içi D&amp;D 5e masası. Bitti.</span>
+        <span class="o-tech">React · Node.js · WebSocket</span></a></li>
+      <li><a href="https://github.com/ErdemWilkinson/Shaman" target="_blank" rel="noopener">
+        <span class="o-arrow">↳</span><span class="o-name">Shaman</span>
+        <span class="o-desc">Belirti anketine göre olası hastalıkları sıralayan Android uygulaması. Bitirme projem.</span>
+        <span class="o-tech">Kotlin · Jetpack Compose · Firebase · Claude API</span></a></li>
+      <li><a href="https://github.com/ErdemWilkinson/turkish-asr-whisper" target="_blank" rel="noopener">
+        <span class="o-arrow">↳</span><span class="o-name">turkish-asr-whisper</span>
+        <span class="o-desc">Fısıltı dahil çevrim dışı Türkçe sesli komutlar için eğitim hattı. Komut veri seti henüz kaydedilmedi.</span>
+        <span class="o-tech">Python · TFLite</span></a></li>
+      <li><a href="https://github.com/ErdemWilkinson/kopru" target="_blank" rel="noopener">
+        <span class="o-arrow">↳</span><span class="o-name">köprü</span>
+        <span class="o-desc">İki laptopu tek masaüstü yapar: ana PC'nin ekranını ikinci laptopa 60 FPS uzatır.</span>
+        <span class="o-tech">Python · Sunshine · Moonlight</span></a></li>
+      <li><a href="https://github.com/ErdemWilkinson/turkish-trend-pipeline" target="_blank" rel="noopener">
+        <span class="o-arrow">↳</span><span class="o-name">Türkçe trend veri seti</span>
+        <span class="o-desc">Hugging Face'te Türkçe trend tahmini veri seti: 24 ay, 66 milyon satır.</span>
+        <span class="o-tech">Python · veri hattı</span></a></li>
+    </ul>
+    </div>
+  </section>
+
+  <!-- SÜREÇ -->
+  <section id="surec" class="wheel-track">
+    <div class="wheel-sticky">
+      <div class="wrap">
+        <div class="wheel-head">
+          <p class="tag"><span>04 /</span> Süreç</p>
+          <h2>Bir modeli karta nasıl indiriyorum</h2>
+        </div>
+        <div class="wheel-layout">
+          <div id="wheel" class="wheel" tabindex="0" role="listbox" aria-label="Süreç aşamaları">
+            <div id="wheel-ring" class="wheel-ring">
+              <svg id="wheel-ticks" class="wheel-ticks" viewBox="0 0 100 100" aria-hidden="true"></svg>
+            </div>
+            <div class="wheel-core">
+              <span class="core-tag">AŞAMA</span>
+              <span id="wheel-num" class="wheel-num">01</span>
+              <span id="wheel-name" class="wheel-name">AYIR</span>
+            </div>
+          </div>
+          <div class="wheel-detail win" aria-live="polite">
+            <div class="win-bar"><i></i><i></i><i></i><span class="win-title">surec.sh</span></div>
+            <div class="wheel-detail-body" style="padding:clamp(1.3rem,3vw,2.1rem)">
+              <div class="wd-top">
+                <span id="wd-idx" class="wd-idx">AŞAMA // 01 / 06</span>
+                <div class="wd-progress-rail"><div id="wd-progress-bar" class="wd-progress-bar"></div></div>
+                <div class="wd-nav">
+                  <button type="button" id="wd-prev" aria-label="Önceki aşama">←</button>
+                  <button type="button" id="wd-next" aria-label="Sonraki aşama">→</button>
+                </div>
+              </div>
+              <h3 id="wd-title"></h3>
+              <p id="wd-desc" class="wd-desc"></p>
+              <div class="wd-proof">
+                <span>REPO TELEMETRİSİ</span>
+                <p id="wd-ex"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SIĞAR MI -->
+  <section id="sigar" class="fit">
+    <div class="wrap">
+      <div class="fit-head">
+        <p class="tag"><span>05 /</span> Disket</p>
+        <h2>Modellerim bir diskete sığar mı?</h2>
+        <p class="lede-sm">1,44 MB'lık bir disket bugün çok küçük. Mikrodenetleyici modellerimin hepsi yine de tek bir diskete sığıyor. Modelleri seçip toplamı kendin gör.</p>
+      </div>
+      <div class="fit-grid">
+        <div class="win fit-models">
+          <div class="win-bar"><i></i><i></i><i></i><span class="win-title">models</span><span class="win-meta">int8 dosya boyutları</span></div>
+          <ul id="fit-list" class="fit-list"></ul>
+        </div>
+        <div class="win fit-disk">
+          <div class="win-bar"><i></i><i></i><i></i><span class="win-title">disket.img</span><span id="fit-sum-small" class="win-meta"></span></div>
+          <div class="fit-total"><b id="fit-total">0 KB</b><span id="fit-count">0 model</span></div>
+          <div id="fit-floppies" class="floppies"></div>
+          <p id="fit-verdict" class="fit-verdict"></p>
+          <ul id="fit-lat" class="fit-lat"></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- KAYIT -->
+  <section id="kayit" class="log-track">
+    <div class="log-sticky">
+      <div class="fs">
+        <div class="fs-head">
+          <p class="tag"><span>06 /</span> Geçmiş</p>
+          <h2>Kod dışında da bir geçmişim var</h2>
+          <p class="lede-sm">Kaydırdıkça dosyalar yana akar. Birine tıklarsan oraya gider.</p>
+        </div>
+        <div class="fs-view">
+          <div id="deck" class="fs-track"></div>
+        </div>
+        <div class="fs-foot"><span id="deck-count">01 / 05</span><div class="deck-steps" id="deck-steps"></div><span class="fs-hint">↓ kaydır</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="vine-band" aria-hidden="true"><canvas></canvas></div>
+
+  <!-- NOTLAR -->
+  <section id="notlar" class="notes">
+    <div class="wrap">
+      <div class="notes-head">
+        <p class="tag"><span>07 /</span> Notlar</p>
+        <h2>Kısaca bilmen gerekenler</h2>
+        <p class="lede-sm">Bir başlığa tıkla, kısa notu oku.</p>
+      </div>
+      <div class="fold-list">
+        <div class="fold open">
+          <button type="button" class="fold-head" aria-expanded="true"><span class="fold-n">01</span><span class="fold-q">Yalnızca gömülü değilim</span><span class="fold-ico" aria-hidden="true"></span></button>
+          <div class="fold-body"><div class="fold-in"><p>TypeScript, React, Vite, Node.js/Express, WebSocket, WebRTC, React Native (Expo), Kotlin (Jetpack Compose), Firebase, Supabase ve Stripe ile çalışıyorum. OME Marketing için emlak pazaryeri uygulaması, Açık Masa, Shaman ve evosim bu taraftan.</p></div></div>
+        </div>
+        <div class="fold">
+          <button type="button" class="fold-head" aria-expanded="false"><span class="fold-n">02</span><span class="fold-q">200 KB'ın altına böyle sığıyor</span><span class="fold-ico" aria-hidden="true"></span></button>
+          <div class="fold-body"><div class="fold-in"><p>İlk günden kartın desteklediği işlemlere göre tasarlayarak: çapasız başlık, yalnızca TFLite Micro işlemleri, eğitim sırasında nicemleme (QAT) ve yapısal kanal budama. OCR'da BiLSTM'i evrişimli bir çıkışla değiştirmek, int8 kaybını 26–48 puandan yaklaşık 1 puana indirdi.</p></div></div>
+        </div>
+        <div class="fold">
+          <button type="button" class="fold-head" aria-expanded="false"><span class="fold-n">03</span><span class="fold-q">Başarısız denemeleri de yazıyorum</span><span class="fold-ico" aria-hidden="true"></span></button>
+          <div class="fold-body"><div class="fold-in"><p>Gömülü ML'de iyi görünen bir model int8'e inince ya da kamera değişince çökebilir. Her sürüm önceden belirlediğim bir eşiği geçerse yayımlanıyor. VoxHOD'da damıtma ve SARD verisi geçemedi; Posibrain'de çoklu dron ve budama kötü çıktı. Bunları README'ye yazmak, modeli kullanacak kişinin haftalarını kurtarır.</p></div></div>
+        </div>
+        <div class="fold">
+          <button type="button" class="fold-head" aria-expanded="false"><span class="fold-n">04</span><span class="fold-q">Şu an aradığım iş</span><span class="fold-ico" aria-hidden="true"></span></button>
+          <div class="fold-body"><div class="fold-in"><p>Junior yazılım geliştirici rolleri, staj, freelance işler ve iş birlikleri; uzaktan da olur. Karadeniz Teknik Üniversitesi Bilgisayar Programcılığı ön lisansından staj zorunluluğunun ardından Ocak 2027'de mezun olmayı bekliyorum. En kolay ulaşım: e-posta ya da GitHub.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- KAPANIŞ -->
+  <div class="vine-band" aria-hidden="true"><canvas></canvas></div>
+
+  <section class="closing">
+    <div class="wrap">
+      <div class="closing-grid">
+        <div class="logo-wrap">
+        <div class="logo-win">
+          <div id="portrait-stage" class="portrait-stage logo-stage">
+            <div class="p-lay p-lay-bg"><img class="p-img p-bg" src="img/logo-arka.webp" alt="" width="760" height="950" loading="lazy" decoding="async"></div>
+            <div class="p-lay p-lay-fg"><img class="p-img p-fg" src="img/logo-on.webp" alt="Erdem Aslan: halftone portre" width="760" height="950" loading="lazy" decoding="async"></div>
+            <div class="p-fog" aria-hidden="true"></div>
+            <div class="p-glow" aria-hidden="true"></div>
+          </div>
+        </div>
+        <ul class="rpg" aria-label="Karakter istatistikleri">
+          <li><span>int8 nicemleme</span><b data-v="10"></b></li>
+          <li><span>LARPER</span><b data-v="10"></b></li>
+          <li><span>Uyku düzeni</span><b data-v="3"></b></li>
+          <li><span>d20 şansı</span><b data-v="7"></b></li>
+          <li><span>Kablo düzeni</span><b data-v="4"></b></li>
+        </ul>
+        </div>
+        <div class="seq">
+          <p class="seq-line">ÖLÇ.</p>
+          <p class="seq-line">BUDA.</p>
+          <p class="seq-line">KARTA <em>YAZ.</em></p>
+        </div>
+      </div>
+      <p class="closing-text">Junior yazılım geliştirici, staj ya da freelance iş arıyorum. Gömülü sistemler, TinyML, web ve mobil üzerinde çalışabilirim; uzaktan da olur. Neyi ölçtüğümü de neyi ölçemediğimi de açıkça yazarım. Benimle çalışmak isterseniz:</p>
+      <div class="cta-frame"><canvas class="vine" aria-hidden="true"></canvas><a class="btn btn-hot btn-big" href="mailto:erdemaslan473@gmail.com">erdemaslan473@gmail.com</a></div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <canvas id="wordmark" role="button" tabindex="0" data-cur="etiketi sök" aria-label="Erdem Wilkinson. Etiketi sökersen arkasında Erdem Aslan yazıyor"></canvas>
+    <div class="foot-row">
+      <div class="foot-links">
+        <a href="mailto:erdemaslan473@gmail.com">e-posta</a>
+        <a href="https://github.com/ErdemWilkinson" target="_blank" rel="noopener">github.com/ErdemWilkinson</a>
+        <a href="https://huggingface.co/inviolus" target="_blank" rel="noopener">huggingface.co/inviolus</a>
+        <a href="https://www.linkedin.com/in/erdem-aslan-89a29b278/" target="_blank" rel="noopener">linkedin.com/in/erdem-aslan</a>
+      </div>
+      <p class="foot-note">© 2026 Erdem Aslan · Elle yazılmış HTML, CSS ve JS. Çerçeve yok, takip yok. <span class="foot-lie"><i aria-hidden="true">←</i> yalan</span></p>
+    </div>
+  </div>
+  <canvas id="forest" class="forest" aria-hidden="true"></canvas>
+</footer>
+
+<script src="i18n.js" defer></script>
+<script src="main.js" defer></script>
+<script src="ambient.js" defer></script>
+<script src="pixelart.js" defer></script>
+<script src="portrait.js" defer></script>
+<script src="warp.js" defer></script>
+<script src="cursorfx.js" defer></script>
+<script src="ember.js" defer></script>
+<script type="module" src="models3d.js"></script>
+</body>
+</html>
