@@ -69,7 +69,7 @@ html.wk .wk-px-canvas {
    Ana styles.css dosyasına dokunmadan WebKit hatalarını giderir
    ========================================================== */
 
-/* 1. iOS Safari adres çubuğu yüzünden 100vh taşmasını 100dvh ile düzelt */
+/* 1. iOS Safari adres çubuğu yüzünden 100vh taşmasını 100dvh / 100lvh ile düzelt */
 @supports (height: 100dvh) {
   html.wk .hero,
   html.wk .hero-grid,
@@ -83,6 +83,11 @@ html.wk .wk-px-canvas {
   html.wk #click-fx,
   html.wk .cursor-trail {
     height: 100dvh;
+  }
+
+  html.wk #ambient {
+    width: 100vw !important;
+    height: 100lvh !important;
   }
 }
 
@@ -102,7 +107,7 @@ html.wk .log-sticky {
   }
 }
 
-/* 3. Kart istifi, süreç çarkı, yatay geçmiş ve portre animasyonlarını Safari GPU katmanına al */
+/* 3. Kart istifi, süreç haritası, yatay geçmiş ve portre animasyonlarını Safari GPU katmanına al */
 html.wk .card,
 html.wk .wheel-ring,
 html.wk .fs-track,
@@ -110,6 +115,55 @@ html.wk .p-lay {
   will-change: transform;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
+}
+
+/* Safari'de position:sticky kart üstünde dinamik filter:brightness() takılma/kaybolma yapıyor */
+html.wk .card {
+  filter: none !important;
+  opacity: calc(1 - var(--p) * 0.22);
+}
+
+/* Safari'de margin-top animasyonu yerine GPU transform zıplaması */
+@keyframes wk-hero-bob {
+  0%, 100% {
+    transform: translate(-50%, -100%);
+  }
+  50% {
+    transform: translate(-50%, calc(-100% - 5px));
+  }
+}
+
+html.wk .wheel-hero {
+  animation: wk-hero-bob 0.7s steps(2) infinite;
+}
+
+/* Safari'de portre drop-shadow animasyon titremesini yumuşat */
+html.wk .p-fg {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+/* Safari'de açılış crt-off animasyonu için -webkit-clip-path desteği */
+@keyframes wk-crt-off {
+  0% {
+    -webkit-clip-path: inset(0 0 0 0);
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+  60% {
+    -webkit-clip-path: inset(47% 0 47% 0);
+    clip-path: inset(47% 0 47% 0);
+    opacity: 1;
+  }
+  100% {
+    -webkit-clip-path: inset(50% 50% 50% 50%);
+    clip-path: inset(50% 50% 50% 50%);
+    opacity: 0;
+  }
+}
+
+html.wk #boot.out {
+  animation-name: wk-crt-off;
 }
 
 /* 4. Safari'de piksel canvas'ların bulanıklaşmasını önle */

@@ -66,13 +66,12 @@
     ['.card h3', 2.0],
     ['.wheel-detail h3', 2.0],
     ['.proof dd', 2.4],
-    ['.seq-line', 3.4],
     ['.lab3d-specs h3', 2.0],
     ['.fs-who', 2.0],
     ['.fold-q', 1.8],
   ];
 
-  // Metin düğümlerini satır parçalarına (kelime/satır) bölerek gerçek renk + konumla çizer
+  // Metin düğümlerini satır parçalarına bölerek gerçek canlı renk + konumla çizer
   function collectLines(el) {
     const hostRect = el.getBoundingClientRect();
     const pieces = [];
@@ -83,7 +82,7 @@
       if (!text || !text.trim()) continue;
       const parent = node.parentElement || el;
       const cs = getComputedStyle(parent);
-      const color = parent.dataset.wkColor || cs.color || '#f6f5f1';
+      const color = cs.color || '#f6f5f1';
       const font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
       const range = document.createRange();
       let start = 0;
@@ -113,18 +112,6 @@
     return { hostRect, pieces };
   }
 
-  function snapshotColors(el) {
-    if (!el.dataset.wkColor) {
-      el.dataset.wkColor = getComputedStyle(el).color;
-    }
-    el.querySelectorAll('*').forEach((child) => {
-      if (child.classList.contains('wk-px-canvas')) return;
-      if (!child.dataset.wkColor) {
-        child.dataset.wkColor = getComputedStyle(child).color;
-      }
-    });
-  }
-
   function paintElement(el, pxSize) {
     const hadHost = el.classList.contains('wk-px-host');
     if (hadHost) el.classList.remove('wk-px-host');
@@ -132,15 +119,15 @@
     const oldCanvas = el.querySelector(':scope > .wk-px-canvas');
     if (oldCanvas) oldCanvas.style.display = 'none';
 
-    snapshotColors(el);
     const { hostRect, pieces } = collectLines(el);
     if (hostRect.width < 4 || hostRect.height < 4 || pieces.length === 0) {
       if (oldCanvas) oldCanvas.remove();
       return;
     }
 
-    const w = Math.ceil(hostRect.width);
-    const h = Math.ceil(hostRect.height);
+    const padY = 6;
+    const w = Math.ceil(hostRect.width) + 4;
+    const h = Math.ceil(hostRect.height) + padY * 2;
     const lw = Math.max(8, Math.round(w / pxSize));
     const lh = Math.max(6, Math.round(h / pxSize));
 
@@ -154,6 +141,7 @@
     cv.width = lw;
     cv.height = lh;
     cv.style.display = 'block';
+    cv.style.top = `${-padY}px`;
     cv.style.width = `${w}px`;
     cv.style.height = `${h}px`;
 
@@ -162,15 +150,15 @@
     ctx.clearRect(0, 0, lw, lh);
     ctx.save();
     ctx.scale(lw / w, lh / h);
-    ctx.textBaseline = 'top';
+    // Safari'de textBaseline:'top' dikey kayma yaptığı için 'alphabetic' + güvenli taban çizgisi kullan
+    ctx.textBaseline = 'alphabetic';
     for (const p of pieces) {
       ctx.font = p.font;
       ctx.fillStyle = p.color;
-      ctx.fillText(p.text, p.x, p.y);
+      ctx.fillText(p.text, p.x, p.y + padY + p.h * 0.78);
     }
     ctx.restore();
 
-    // SVG feFuncA discrete eşiğiyle aynı keskin piksel kenarları
     const img = ctx.getImageData(0, 0, lw, lh);
     const d = img.data;
     for (let i = 3; i < d.length; i += 4) {
