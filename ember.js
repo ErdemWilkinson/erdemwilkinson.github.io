@@ -47,7 +47,8 @@
   let visible = false;
   let t0 = 0;
   let peel = 0; // 0 yapışık .. 1 tamamen sökülmüş
-  let drift = 0; // 0 .. uçuş süresi (söküm bittiği noktadan kesintisiz sola devam eder)
+  let drift = 0; // 0 .. exitDrift (söküm bittiği noktadan kesintisiz sola uçar, geri gelirken tam tersi!)
+  let exitDrift = 1.6;
   let target = 0;
   let autoDone = false;
   let lastT = 0;
@@ -296,7 +297,11 @@
 
     // Ekranın solundan tamamen çıkıp çıkmadığını kontrol et
     const paperRightEdge = (detached ? tx0 : Math.min(cols, xf)) + shiftX;
-    const showFlap = visible && !(reduce && detached) && (paperRightEdge > -needLeftPad - 4);
+    const offScreenLeft = detached && paperRightEdge <= -needLeftPad - 4;
+    if (offScreenLeft && target > 0.5 && drift < exitDrift + 0.05) {
+      exitDrift = drift;
+    }
+    const showFlap = visible && !(reduce && detached) && !offScreenLeft;
 
     if (showFlap && flyCtx) {
       if (flyCols !== needCols || flyRows !== needRows) {
@@ -385,18 +390,26 @@
   }
 
   function loop(now) {
-    const peeling = Math.abs(peel - target) > 0.001;
-    const flying = target > 0.5 && peel >= 0.999 && drift < 3.2;
-    const gap = peeling || flying ? 33 : 55;
+    const goingOut = target > 0.5 && (peel < 0.999 || drift < exitDrift);
+    const comingBack = target < 0.5 && (drift > 0.001 || peel > 0.001);
+    const gap = goingOut || comingBack ? 33 : 55;
     if (visible && now - lastT >= gap) {
       const dt = Math.min(0.1, (now - lastT) / 1000);
       lastT = now;
-      if (peeling) {
-        const step = dt / 1.45;
-        peel = target > peel ? Math.min(target, peel + step) : Math.max(target, peel - step);
-        if (target < 0.5) drift = 0;
-      } else if (flying) {
-        drift += dt;
+      const step = dt / 1.45;
+      if (target > 0.5) {
+        if (peel < 0.999) {
+          peel = Math.min(1, peel + step);
+        } else if (drift < exitDrift) {
+          drift = Math.min(exitDrift, drift + dt);
+        }
+      } else {
+        // Geri dönüş: önce sol kenardan uçarak gelir (drift -> 0), sonra katı açılıp yapışır (peel -> 0)
+        if (drift > 0.001) {
+          drift = Math.max(0, drift - dt * 1.1);
+        } else if (peel > 0.001) {
+          peel = Math.max(0, peel - step);
+        }
       }
       render(now);
     } else if (!visible && flyCv.style.display !== 'none') {
@@ -407,9 +420,10 @@
 
   function setTarget(v) {
     target = v;
-    if (v < 0.5) drift = 0;
+    if (v > 0.5 && drift <= 0.001) exitDrift = 3.2;
+    if (v < 0.5 && drift > exitDrift) drift = exitDrift;
     cv.setAttribute('data-cur', v > 0.5 ? 'etiketi geri yapıştır' : 'etiketi sök');
-    if (reduce) { peel = v; drift = v > 0.5 ? 4 : 0; render(performance.now()); }
+    if (reduce) { peel = v; drift = v > 0.5 ? exitDrift : 0; render(performance.now()); }
   }
 
   cv.addEventListener('click', () => setTarget(target > 0.5 ? 0 : 1));
