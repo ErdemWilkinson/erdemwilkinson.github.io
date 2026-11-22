@@ -30,8 +30,8 @@
     '↻ yeni arazi': '↻ new terrain',
     'Bir karonun üstünde dur.': 'Hover over a tile.',
     'Bir karonun üstünde dur ya da tıkla (321 ms / karo).': 'Hover over a tile or click it (321 ms / tile).',
-    "197 KB · int8 · 24 karo. Bu bir simülasyon ve hedefleri şaka olsun diye böyle çizdim: kişiyi bulma olasılığı (%83,9) ve karo başına yanlış alarm (0,35) VoxHOD v3'ün HERIDAL test sonuçlarından, karo süresi (321 ms) ESP32-P4 ölçümünden alındı.":
-      "197 KB · int8 · 24 tiles. This is a simulation, and I drew the targets like this as a joke: the chance of finding a person (83.9%) and the false alarms per tile (0.35) come from VoxHOD v3's HERIDAL test results; the tile time (321 ms) comes from an ESP32-P4 measurement.",
+    "197 KB · int8 · 24 karo. Bu bir simülasyon: kişiyi bulma olasılığı (%83,9) ve karo başına yanlış alarm (0,35) VoxHOD v3'ün HERIDAL test sonuçlarından, karo süresi (321 ms) ESP32-P4 ölçümünden alındı.":
+      "197 KB · int8 · 24 tiles. This is a simulation: the chance of finding a person (83.9%) and the false alarms per tile (0.35) come from VoxHOD v3's HERIDAL test results; the tile time (321 ms) comes from an ESP32-P4 measurement.",
     'görülmemiş satırda tam doğru': 'exact match on unseen lines',
     "int8, HERIDAL'da %83,9 kişi": 'int8, 83.9% of people found on HERIDAL',
     '%77,3': '77.3%',
