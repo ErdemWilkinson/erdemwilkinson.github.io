@@ -4311,6 +4311,50 @@ summary *,
   border-bottom: 1px dashed var(--line-2);
 }
 
+/* seçili model satırları: piksel dama (dither) dolgu + sol kor çubuğu */
+.fit-models.win .fit-row {
+  position: relative;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.fit-models.win .fit-row .ar {
+  opacity: 0.35;
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.fit-models.win .fit-row:hover {
+  background: rgba(246, 245, 241, 0.04);
+  border-color: rgba(246, 245, 241, 0.12);
+}
+
+.fit-models.win .fit-row[aria-pressed="true"] {
+  border-color: rgba(237, 103, 15, 0.55);
+  background-color: rgba(237, 103, 15, 0.08);
+  background-image:
+    linear-gradient(90deg, rgba(237, 103, 15, 0.16) 0%, rgba(237, 103, 15, 0.03) 65%, transparent 100%),
+    repeating-conic-gradient(rgba(237, 103, 15, 0.11) 0% 25%, transparent 0% 50%);
+  background-size: 100% 100%, 4px 4px;
+  box-shadow: inset 4px 0 0 var(--hot), inset 0 0 0 1px rgba(237, 103, 15, 0.18);
+}
+
+.fit-models.win .fit-row[aria-pressed="true"] .ar {
+  opacity: 1;
+  transform: translateX(2px);
+}
+
+.fit-models.win .fit-row[aria-pressed="true"] .bx {
+  color: var(--hot);
+  text-shadow: 0 0 8px rgba(237, 103, 15, 0.55);
+}
+
+.fit-models.win .fit-row[aria-pressed="true"] .nm {
+  color: var(--ink);
+}
+
+.fit-models.win .fit-row[aria-pressed="true"] .kb {
+  color: var(--hot);
+}
+
 /* disket.img = köşe parantezli görüntü alanı */
 .fit-disk.win {
   border: 1px solid var(--line);
