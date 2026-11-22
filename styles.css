@@ -4542,9 +4542,9 @@ summary *,
   box-sizing: border-box;
 }
 
-/* kanıt şeridi: dördüncü sütun (Nano) */
+/* kanıt şeridi: üç sütun (InviolusOCR · VoxHOD v3 · VoxHOD Nano) */
 .proof {
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
 }
 
 .proof .proof-note {
@@ -4557,21 +4557,6 @@ summary *,
 @media (max-width: 760px) {
   .proof {
     grid-template-columns: 1fr;
-  }
-}
-
-@media (min-width: 761px) and (max-width: 1100px) {
-  .proof {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .proof div:nth-child(3) {
-    padding-left: 0;
-    border-left: 0;
-  }
-
-  .proof div:nth-child(n+3) {
-    border-top: 1px solid var(--line-2);
   }
 }
 
