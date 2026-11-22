@@ -340,12 +340,12 @@
 
     // Ekranın solundan tamamen çıkıp çıkmadığını kontrol et (veya yanarak tamamen bitti mi)
     const paperRightEdge = (detached ? tx0 : Math.min(cols, xf)) + shiftX;
-    const burnedOut = burning && burnFront > 1.55 && paperSparks.length === 0;
-    const offScreenLeft = (detached && paperRightEdge <= -needLeftPad - 4) || burnedOut;
-    if (offScreenLeft && target > 0.5 && drift < exitDrift + 0.05) {
+    const burnedOut = burning && burnFront > 1.55;
+    const paperGone = (detached && paperRightEdge <= -needLeftPad - 4) || burnedOut;
+    if (paperGone && target > 0.5 && drift < exitDrift + 0.05) {
       exitDrift = drift;
     }
-    const showFlap = visible && !(reduce && detached) && !offScreenLeft;
+    const showFlap = visible && !(reduce && detached) && (!paperGone || paperSparks.length > 0);
 
     if (showFlap && flyCtx) {
       if (flyCols !== needCols || flyRows !== needRows) {
@@ -372,7 +372,7 @@
       const foldX = detached ? tx0 : xf;
       const startX = Math.max(0, Math.floor(foldX));
 
-      for (let y = 0; y < rows; y++) {
+      for (let y = 0; y < rows && !paperGone; y++) {
         for (let x = startX; x < cols; x++) {
           const ti = y * cols + x;
           if (!tape[ti]) continue;
@@ -473,7 +473,7 @@
   }
 
   function loop(now) {
-    const goingOut = target > 0.5 && (peel < 0.999 || drift < exitDrift);
+    const goingOut = (target > 0.5 && (peel < 0.999 || drift < exitDrift)) || paperSparks.length > 0;
     const comingBack = target < 0.5 && (drift > 0.001 || peel > 0.001);
     const gap = goingOut || comingBack ? 33 : 55;
     if (visible && now - lastT >= gap) {
