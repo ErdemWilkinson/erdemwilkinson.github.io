@@ -347,8 +347,6 @@
       'Junior software developer roles, internships, freelance work and collaborations; remote is fine. I expect to graduate from the Computer Programming associate degree at Karadeniz Technical University in January 2027, after the mandatory internship. Easiest way to reach me: email or GitHub.',
     'Kahve dayanıklılığı': 'Coffee endurance',
     'LARPER': 'LARPER',
-    'Uyku düzeni': 'Sleep schedule',
-    'd20 şansı': 'd20 luck',
     'Kablo düzeni': 'Cable management',
     'ÖLÇ.': 'MEASURE.',
     'BUDA.': 'PRUNE.',
