@@ -34,7 +34,7 @@
       "197 KB · int8 · 24 tiles. This is a simulation: the chance of finding a person (83.9%) and the false alarms per tile (0.35) come from VoxHOD v3's HERIDAL test results; the tile time (321 ms) comes from an ESP32-P4 measurement.",
     'görülmemiş satırda tam doğru': 'exact match on unseen lines',
     "int8, HERIDAL'da %83,9 kişi": 'int8, 83.9% of people found on HERIDAL',
-    'ESP32-P4 · 321 ms / karo': 'ESP32-P4 · 321 ms / tile',
+    'ESP32-P4 · karo başına': 'ESP32-P4 · per tile',
     '%77,3': '77.3%',
     'int8, arama-kurtarma kişi tespiti': 'int8, search-and-rescue person detection',
     'dünyanın en küçük dedektörlerinden biri': 'one of the smallest detectors in the world',

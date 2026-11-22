@@ -554,12 +554,12 @@ footer {
   grid-template-columns: repeat(3, 1fr);
 }
 
-.proof div {
-  padding: 2rem 1.5rem 2rem 0;
+.proof > div {
+  padding: 2rem 1.5rem;
+  text-align: center;
 }
 
-.proof div+div {
-  padding-left: 1.5rem;
+.proof > div+div {
   border-left: 1px solid var(--line-2);
 }
 
@@ -4542,9 +4542,24 @@ summary *,
   box-sizing: border-box;
 }
 
-/* kanıt şeridi: üç sütun (InviolusOCR · VoxHOD v3 · VoxHOD Nano) */
+/* kanıt şeridi: 4 sütun, ortadaki VoxHOD v3 iki sütunu birleştirir (arada çizgi yok) */
 .proof {
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.proof > .proof-pair {
+  grid-column: span 2;
+}
+
+.proof .proof-pair-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.proof .proof-pair-row > div {
+  padding: 0;
+  border: 0;
 }
 
 .proof .proof-note {
@@ -4557,6 +4572,28 @@ summary *,
 @media (max-width: 760px) {
   .proof {
     grid-template-columns: 1fr;
+  }
+  .proof > .proof-pair {
+    grid-column: auto;
+  }
+  .proof > div+div {
+    border-left: 0;
+    border-top: 1px solid var(--line-2);
+  }
+}
+
+@media (min-width: 761px) and (max-width: 1100px) {
+  .proof {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .proof > .proof-pair {
+    grid-column: 1 / -1;
+    order: -1;
+    border-left: 0;
+    border-bottom: 1px solid var(--line-2);
+  }
+  .proof > div:first-child {
+    border-left: 0;
   }
 }
 
