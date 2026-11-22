@@ -503,25 +503,25 @@
 
   function setTarget(v) {
     target = v;
-    if (v > 0.5 && drift <= 0.001) {
-      burnSeed++;
-      rebuildBurnMap();
-      paperSparks = [];
+    if (v > 0.5) {
+      if (drift <= 0.001) {
+        burnSeed++;
+        rebuildBurnMap();
+      }
       exitDrift = 4.5;
-    }
-    if (v < 0.5) {
-      paperSparks = [];
-      // Taze etiket ekranın sol kenarından uçarak gelsin (yanıp yarıda bittiyse ortadan belirmez)
+    } else {
+      // Taze etiket ekranın sol kenarından uçarak gelsin (yalnızca önceki tamamen çıkıp/yanıp bittiyse)
       const w = Math.max(1, tx1 - tx0);
       const r = cv.getBoundingClientRect();
       const hr = footHost.getBoundingClientRect();
       const scaleX = r.width / Math.max(1, cols);
       const leftPad = Math.ceil(Math.max(0, r.left - hr.left) / Math.max(1, scaleX)) + 4;
       const dist = tx0 + leftPad + 4;
-      // solve 0.58*d^2 + 0.68*d = dist/w
       const rhs = dist / w;
       const offDrift = (-0.68 + Math.sqrt(0.68 * 0.68 + 4 * 0.58 * rhs)) / (2 * 0.58);
-      if (peel >= 0.999) drift = Math.max(drift, offDrift);
+      if (peel >= 0.999 && (drift >= exitDrift - 0.05 || drift * 1.05 > 1.55)) {
+        drift = Math.max(drift, offDrift);
+      }
       exitDrift = offDrift;
     }
     cv.setAttribute('data-cur', v > 0.5 ? 'etiketi geri yapıştır' : 'etiketi sök');
