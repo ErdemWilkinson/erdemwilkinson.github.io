@@ -41,6 +41,9 @@
   let tx1 = 0;
   let topA = [];
   let sparks = [];
+  let paperSparks = [];
+  let burnMap = null;
+  let burnSeed = 0;
   const mouse = { x: -999, y: -999 };
 
   let started = false;
@@ -199,11 +202,40 @@
     }
     tx0 = minX;
     tx1 = maxX;
+    burnMap = new Float32Array(cols * rows);
+    rebuildBurnMap();
 
     cv.width = cols;
     cv.height = rows;
     img = ctx.createImageData(cols, rows);
     sparks = [];
+    paperSparks = [];
+  }
+
+  function rebuildBurnMap() {
+    if (!burnMap || !tape) return;
+    const w = Math.max(1, tx1 - tx0);
+    const seedX = (burnSeed * 17.3) % 97;
+    const seedY = (burnSeed * 29.1) % 89;
+    // 2 rastgele tutuşma odağı + çok ölçekli gürültü: her sökümde düzensiz, organik yanma
+    const fx1 = tx0 + w * (0.25 + hash(burnSeed, 1) * 0.55);
+    const fy1 = rows * (0.25 + hash(burnSeed, 2) * 0.5);
+    const fx2 = tx0 + w * (0.15 + hash(burnSeed, 3) * 0.7);
+    const fy2 = rows * (0.2 + hash(burnSeed, 4) * 0.6);
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        const i = y * cols + x;
+        if (!tape[i]) continue;
+        const u = (x - tx0) / w;
+        const d1 = Math.hypot((x - fx1) / (w * 0.45), (y - fy1) / (rows * 0.55));
+        const d2 = Math.hypot((x - fx2) / (w * 0.55), (y - fy2) / (rows * 0.6));
+        const hotspot = Math.min(d1, d2) * 0.42;
+        const n1 = vnoise(x * 0.13 + seedX, y * 0.13 + seedY) * 0.52;
+        const n2 = vnoise(x * 0.34 + seedX * 1.7, y * 0.34 + seedY * 1.3) * 0.24;
+        const n3 = hash(x + burnSeed * 7, y) * 0.08;
+        burnMap[i] = hotspot + n1 + n2 + n3 + u * 0.16;
+      }
+    }
   }
 
   function put(d, i, p) {
@@ -300,16 +332,16 @@
     const needCols = needLeftPad + cols;
     const needRows = FLY_TOP_PAD + rows + 8;
 
-    const pLift = detached ? Math.min(1, drift / 0.4) : 0;
-    const pEase = pLift * pLift * (3 - 2 * pLift);
-    const shiftX = detached ? -Math.round(drift * w * 0.62 + drift * drift * w * 0.52) : 0;
-    const shiftY = detached ? -Math.round(drift * 10 + Math.sin(drift * 3.0) * 3.0 * pEase) : 0;
-    const liftSlope = detached ? Math.min(0.1, drift * 0.08) : 0;
-    const flutterAmp = detached ? Math.min(2.0, drift * 2.5) : 0;
+    const shiftX = detached ? -(drift * w * 0.68 + drift * drift * w * 0.58) : 0;
+    const shiftY = detached ? -drift * 11 : 0;
+    const flutterAmp = detached ? Math.min(3.5, drift * 4.5) : 0;
+    const burning = detached && target > 0.5 && !reduce;
+    const burnFront = burning ? drift * 1.05 : -1;
 
-    // Ekranın solundan tamamen çıkıp çıkmadığını kontrol et
+    // Ekranın solundan tamamen çıkıp çıkmadığını kontrol et (veya yanarak tamamen bitti mi)
     const paperRightEdge = (detached ? tx0 : Math.min(cols, xf)) + shiftX;
-    const offScreenLeft = detached && paperRightEdge <= -needLeftPad - 6;
+    const burnedOut = burning && burnFront > 1.55 && paperSparks.length === 0;
+    const offScreenLeft = (detached && paperRightEdge <= -needLeftPad - 4) || burnedOut;
     if (offScreenLeft && target > 0.5 && drift < exitDrift + 0.05) {
       exitDrift = drift;
     }
@@ -342,22 +374,61 @@
 
       for (let y = 0; y < rows; y++) {
         for (let x = startX; x < cols; x++) {
-          if (!tape[y * cols + x]) continue;
+          const ti = y * cols + x;
+          if (!tape[ti]) continue;
           const xd = x - foldX;
-          const waveY = flutterAmp > 0 ? Math.round(Math.sin(drift * 6.0 - xd * 0.09) * flutterAmp) : 0;
-          const nx = Math.round(2 * foldX - x) + shiftX;
-          const ny = Math.round(y - (0.16 + liftSlope) * xd) + shiftY + waveY;
+          const waveY = flutterAmp > 0 ? Math.sin(drift * 6.5 + xd * 0.11) * flutterAmp : 0;
+          const nx = Math.round(2 * foldX - x + shiftX);
+          const ny = Math.round(y - 0.16 * xd + shiftY + waveY);
+
+          let col = null;
+          if (burning && burnMap) {
+            const delta = burnFront - burnMap[ti];
+            if (delta > 0.19) {
+              if (delta < 0.28 && Math.random() < 0.09 && paperSparks.length < 110) {
+                paperSparks.push({
+                  x: nx,
+                  y: ny,
+                  vx: -(0.15 + Math.random() * 0.45),
+                  vy: -(0.35 + Math.random() * 0.75),
+                  life: 0,
+                  max: 16 + Math.random() * 24,
+                });
+              }
+              continue;
+            }
+            if (delta > 0.12) col = hash(x, y) < 0.35 ? PAL[5] : PAL[4];
+            else if (delta > 0.06) col = PAL[3];
+            else if (delta > 0.0) col = PAL[1];
+          }
+
           const fx = nx + flyLeftPad;
           const fy = ny + FLY_TOP_PAD;
           if (fx < 0 || fx >= flyCols || fy < 0 || fy >= flyRows) continue;
           const fi = fy * flyCols + fx;
           flap.push(fi);
-          const sh = Math.min(1, xd / (w * 0.16));
-          const col = hash(x >> 1, y >> 1) < 0.12 + (1 - sh) * 0.35 ? PAPER_D : PAPER_BACK;
+          if (!col) {
+            const sh = Math.min(1, xd / (w * 0.16));
+            col = hash(x >> 1, y >> 1) < 0.12 + (1 - sh) * 0.35 ? PAPER_D : PAPER_BACK;
+          }
           const fo = fi * 4;
           fd[fo] = col[0]; fd[fo + 1] = col[1]; fd[fo + 2] = col[2]; fd[fo + 3] = 255;
           mark[fi] = 1;
         }
+      }
+      // Yanma kıvılcımları (uçan kâğıttan kopan kor pikselleri)
+      paperSparks = paperSparks.filter((s) => s.life < s.max);
+      for (const s of paperSparks) {
+        s.life++;
+        s.x += s.vx;
+        s.y += s.vy;
+        const fx = Math.round(s.x) + flyLeftPad;
+        const fy = Math.round(s.y) + FLY_TOP_PAD;
+        if (fx < 0 || fx >= flyCols || fy < 0 || fy >= flyRows) continue;
+        const k = s.life / s.max;
+        const sc = k < 0.3 ? PAL[6] : k < 0.65 ? PAL[5] : PAL[4];
+        const so2 = (fy * flyCols + fx) * 4;
+        fd[so2] = sc[0]; fd[so2 + 1] = sc[1]; fd[so2 + 2] = sc[2]; fd[so2 + 3] = Math.round(255 * (1 - k * 0.45));
       }
       // Kalkan kâğıdın kendi piksel gölgesi (söküm sırasında koyu, uçarken hafifler)
       const shadowA = detached ? Math.max(0, Math.round(115 * (1 - drift * 0.45))) : 125;
@@ -432,8 +503,27 @@
 
   function setTarget(v) {
     target = v;
-    if (v > 0.5 && drift <= 0.001) exitDrift = 4.5;
-    if (v < 0.5 && drift > exitDrift) drift = exitDrift;
+    if (v > 0.5 && drift <= 0.001) {
+      burnSeed++;
+      rebuildBurnMap();
+      paperSparks = [];
+      exitDrift = 4.5;
+    }
+    if (v < 0.5) {
+      paperSparks = [];
+      // Taze etiket ekranın sol kenarından uçarak gelsin (yanıp yarıda bittiyse ortadan belirmez)
+      const w = Math.max(1, tx1 - tx0);
+      const r = cv.getBoundingClientRect();
+      const hr = footHost.getBoundingClientRect();
+      const scaleX = r.width / Math.max(1, cols);
+      const leftPad = Math.ceil(Math.max(0, r.left - hr.left) / Math.max(1, scaleX)) + 4;
+      const dist = tx0 + leftPad + 4;
+      // solve 0.58*d^2 + 0.68*d = dist/w
+      const rhs = dist / w;
+      const offDrift = (-0.68 + Math.sqrt(0.68 * 0.68 + 4 * 0.58 * rhs)) / (2 * 0.58);
+      if (peel >= 0.999) drift = Math.max(drift, offDrift);
+      exitDrift = offDrift;
+    }
     cv.setAttribute('data-cur', v > 0.5 ? 'etiketi geri yapıştır' : 'etiketi sök');
     if (reduce) { peel = v; drift = v > 0.5 ? exitDrift : 0; render(performance.now()); }
   }
