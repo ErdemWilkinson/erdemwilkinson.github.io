@@ -300,18 +300,16 @@
     const needCols = needLeftPad + cols;
     const needRows = FLY_TOP_PAD + rows + 8;
 
-    const pLift = detached ? Math.min(1, drift / 0.45) : 0;
+    const pLift = detached ? Math.min(1, drift / 0.4) : 0;
     const pEase = pLift * pLift * (3 - 2 * pLift);
-    const shiftX = detached ? -(drift * w * 0.52 + drift * drift * w * 0.46) : 0;
-    const shiftY = detached ? -(drift * 9 + Math.sin(drift * 2.6) * 5.5 * pEase + drift * drift * 2.6) : 0;
-    const flyAngle = detached ? -(Math.min(0.28, drift * 0.16) + Math.sin(drift * 3.8) * 0.055 * pEase) : 0;
-    const cosA = Math.cos(flyAngle);
-    const sinA = Math.sin(flyAngle);
-    const flutterAmp = detached ? Math.min(3.8, drift * 4.2) : 0;
+    const shiftX = detached ? -Math.round(drift * w * 0.62 + drift * drift * w * 0.52) : 0;
+    const shiftY = detached ? -Math.round(drift * 10 + Math.sin(drift * 3.0) * 3.0 * pEase) : 0;
+    const liftSlope = detached ? Math.min(0.1, drift * 0.08) : 0;
+    const flutterAmp = detached ? Math.min(2.0, drift * 2.5) : 0;
 
     // Ekranın solundan tamamen çıkıp çıkmadığını kontrol et
     const paperRightEdge = (detached ? tx0 : Math.min(cols, xf)) + shiftX;
-    const offScreenLeft = detached && paperRightEdge <= -needLeftPad - 8;
+    const offScreenLeft = detached && paperRightEdge <= -needLeftPad - 6;
     if (offScreenLeft && target > 0.5 && drift < exitDrift + 0.05) {
       exitDrift = drift;
     }
@@ -341,24 +339,14 @@
       const flap = [];
       const foldX = detached ? tx0 : xf;
       const startX = Math.max(0, Math.floor(foldX));
-      const pivX = tx0 - w * 0.5;
-      const pivY = rows * 0.5 - 0.08 * w;
 
       for (let y = 0; y < rows; y++) {
         for (let x = startX; x < cols; x++) {
           if (!tape[y * cols + x]) continue;
           const xd = x - foldX;
-          const waveY = flutterAmp > 0 ? Math.sin(drift * 7.2 - xd * 0.13) * flutterAmp : 0;
-          let bx = 2 * foldX - x;
-          let by = y - 0.16 * xd + waveY;
-          if (detached) {
-            const dxp = bx - pivX;
-            const dyp = by - pivY;
-            bx = pivX + dxp * cosA - dyp * sinA;
-            by = pivY + dxp * sinA + dyp * cosA;
-          }
-          const nx = Math.round(bx + shiftX);
-          const ny = Math.round(by + shiftY);
+          const waveY = flutterAmp > 0 ? Math.round(Math.sin(drift * 6.0 - xd * 0.09) * flutterAmp) : 0;
+          const nx = Math.round(2 * foldX - x) + shiftX;
+          const ny = Math.round(y - (0.16 + liftSlope) * xd) + shiftY + waveY;
           const fx = nx + flyLeftPad;
           const fy = ny + FLY_TOP_PAD;
           if (fx < 0 || fx >= flyCols || fy < 0 || fy >= flyRows) continue;
