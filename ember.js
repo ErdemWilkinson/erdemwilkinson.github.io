@@ -67,7 +67,7 @@
   let flyCols = 0;
   let flyRows = 0;
   let flyLeftPad = 0;
-  const FLY_TOP_PAD = 28;
+  const FLY_TOP_PAD = 56;
 
   function hash(x, y) {
     let h = (Math.imul(x | 0, 374761393) + Math.imul(y | 0, 668265263)) | 0;
@@ -300,13 +300,18 @@
     const needCols = needLeftPad + cols;
     const needRows = FLY_TOP_PAD + rows + 8;
 
-    const shiftX = detached ? -(drift * w * 0.68 + drift * drift * w * 0.58) : 0;
-    const shiftY = detached ? -drift * 11 : 0;
-    const flutterAmp = detached ? Math.min(3.5, drift * 4.5) : 0;
+    const pLift = detached ? Math.min(1, drift / 0.45) : 0;
+    const pEase = pLift * pLift * (3 - 2 * pLift);
+    const shiftX = detached ? -(drift * w * 0.52 + drift * drift * w * 0.46) : 0;
+    const shiftY = detached ? -(drift * 9 + Math.sin(drift * 2.6) * 5.5 * pEase + drift * drift * 2.6) : 0;
+    const flyAngle = detached ? -(Math.min(0.28, drift * 0.16) + Math.sin(drift * 3.8) * 0.055 * pEase) : 0;
+    const cosA = Math.cos(flyAngle);
+    const sinA = Math.sin(flyAngle);
+    const flutterAmp = detached ? Math.min(3.8, drift * 4.2) : 0;
 
     // Ekranın solundan tamamen çıkıp çıkmadığını kontrol et
     const paperRightEdge = (detached ? tx0 : Math.min(cols, xf)) + shiftX;
-    const offScreenLeft = detached && paperRightEdge <= -needLeftPad - 4;
+    const offScreenLeft = detached && paperRightEdge <= -needLeftPad - 8;
     if (offScreenLeft && target > 0.5 && drift < exitDrift + 0.05) {
       exitDrift = drift;
     }
@@ -336,14 +341,24 @@
       const flap = [];
       const foldX = detached ? tx0 : xf;
       const startX = Math.max(0, Math.floor(foldX));
+      const pivX = tx0 - w * 0.5;
+      const pivY = rows * 0.5 - 0.08 * w;
 
       for (let y = 0; y < rows; y++) {
         for (let x = startX; x < cols; x++) {
           if (!tape[y * cols + x]) continue;
           const xd = x - foldX;
-          const waveY = flutterAmp > 0 ? Math.sin(drift * 6.5 + xd * 0.11) * flutterAmp : 0;
-          const nx = Math.round(2 * foldX - x + shiftX);
-          const ny = Math.round(y - 0.16 * xd + shiftY + waveY);
+          const waveY = flutterAmp > 0 ? Math.sin(drift * 7.2 - xd * 0.13) * flutterAmp : 0;
+          let bx = 2 * foldX - x;
+          let by = y - 0.16 * xd + waveY;
+          if (detached) {
+            const dxp = bx - pivX;
+            const dyp = by - pivY;
+            bx = pivX + dxp * cosA - dyp * sinA;
+            by = pivY + dxp * sinA + dyp * cosA;
+          }
+          const nx = Math.round(bx + shiftX);
+          const ny = Math.round(by + shiftY);
           const fx = nx + flyLeftPad;
           const fy = ny + FLY_TOP_PAD;
           if (fx < 0 || fx >= flyCols || fy < 0 || fy >= flyRows) continue;
