@@ -97,22 +97,29 @@
     const m = document.createElement('canvas');
     const mc = m.getContext('2d');
     mc.font = `800 100px ${SERIF}`;
-    const wA = mc.measureText('ASLAN').width;
-    const fsA = (100 * cols * 0.84) / wA;
-    const capA = fsA * 0.72;
-    const fsE = fsA * 0.56;
-    const capE = fsE * 0.72;
-    const pad = 16;
-    const gap = Math.max(6, fsA * 0.12);
-    rows = Math.ceil(pad + capE + gap + capA + 8);
+    const wE100 = mc.measureText('ERDEM').width;
+    const wA100 = mc.measureText('ASLAN').width;
+    const gap100 = 36;
+    const total100 = wE100 + gap100 + wA100;
+    const fs = (100 * cols * 0.9) / total100;
+    const cap = fs * 0.72;
+    const wE = (wE100 / 100) * fs;
+    const wA = (wA100 / 100) * fs;
+    const gapX = (gap100 / 100) * fs;
+    const totalW = wE + gapX + wA;
+    const startX = (cols - totalW) / 2;
+    const cxE = startX + wE / 2;
+    const cxA = startX + wE + gapX + wA / 2;
+    const padTop = Math.max(18, Math.ceil(cap * 0.45));
+    const padBot = Math.max(12, Math.ceil(cap * 0.28));
+    rows = Math.ceil(padTop + cap + padBot);
     m.width = cols;
     m.height = rows;
     const c = m.getContext('2d');
     c.textAlign = 'center';
     c.fillStyle = '#fff';
 
-    const baseE = pad + capE;
-    const baseA = baseE + gap + capA;
+    const baseY = padTop + cap;
 
     const read = (draw) => {
       c.setTransform(1, 0, 0, 1, 0, 0);
@@ -123,26 +130,28 @@
       return c.getImageData(0, 0, cols, rows).data;
     };
 
-    const dE = read(() => { c.font = `800 ${fsE}px ${SERIF}`; c.fillText('ERDEM', cols / 2, baseE); });
-    const dA = read(() => { c.font = `800 ${fsA}px ${SERIF}`; c.fillText('ASLAN', cols / 2, baseA); });
+    const dE = read(() => { c.font = `800 ${fs}px ${SERIF}`; c.fillText('ERDEM', cxE, baseY); });
+    const dA = read(() => { c.font = `800 ${fs}px ${SERIF}`; c.fillText('ASLAN', cxA, baseY); });
 
-    // etiket: ASLAN'ın ortasından geçen, hafif eğik kâğıt bant
+    // etiket: yalnızca ASLAN'ın üstüne yapıştırılmış, hafif eğik kâğıt bant (ERDEM solda kalır)
     const probe = document.createElement('canvas').getContext('2d');
     probe.font = `400 100px ${LABEL}`;
     const wW = probe.measureText('WILKINSON').width;
-    const fsT = (100 * cols * 0.62) / wW;
+    const maxTwLeft = (cxA - (startX + wE) - 2) * 2;
+    const maxTwRight = (cols - cxA - 2) * 2;
+    const tw = Math.min(wA * 1.12, maxTwLeft, maxTwRight);
+    const fsT = (100 * (tw * 0.8)) / wW;
     const capT = fsT * 0.7;
-    const th = capT * 1.3;
-    const tw = cols * 0.8;
-    const tcy = baseA - capA * 0.4;
+    const th = Math.max(cap * 0.62, capT * 1.45);
+    const tcy = baseY - cap * 0.42;
     const rot = -0.032;
     const dT = read(() => {
-      c.translate(cols / 2, tcy);
+      c.translate(cxA, tcy);
       c.rotate(rot);
       c.fillRect(-tw / 2, -th / 2, tw, th);
     });
     const dI = read(() => {
-      c.translate(cols / 2, tcy);
+      c.translate(cxA, tcy);
       c.rotate(rot);
       c.font = `400 ${fsT}px ${LABEL}`;
       c.fillText('WILKINSON', 0, capT * 0.36);
@@ -160,10 +169,10 @@
     for (let y = 0; y < rows; y++) {
       for (let x = 0; x < cols; x++) {
         const i = y * cols + x;
-        if (dE[i * 4 + 3] > 120) { maskE[i] = 1; yn[i] = Math.min(1, Math.max(0, (y - (baseE - capE)) / capE)); }
+        if (dE[i * 4 + 3] > 120) { maskE[i] = 1; yn[i] = Math.min(1, Math.max(0, (y - (baseY - cap)) / cap)); }
         if (dA[i * 4 + 3] > 120) {
           maskA[i] = 1;
-          yn[i] = Math.min(1, Math.max(0, (y - (baseA - capA)) / capA));
+          yn[i] = Math.min(1, Math.max(0, (y - (baseY - cap)) / cap));
           topA.push(i);
         }
         if (dT[i * 4 + 3] > 120) {
@@ -175,8 +184,8 @@
     }
     // yırtık uçlar + yüzülmüş yerler
     for (let y = 0; y < rows; y++) {
-      const tearL = 2 + vnoise(y * 0.33, 3.1) * 6 + vnoise(y * 0.9, 7.7) * 2.5;
-      const tearR = 2 + vnoise(y * 0.29, 11.3) * 6 + vnoise(y * 0.8, 5.2) * 2.5;
+      const tearL = 1.5 + vnoise(y * 0.33, 3.1) * 4 + vnoise(y * 0.9, 7.7) * 1.8;
+      const tearR = 1.5 + vnoise(y * 0.29, 11.3) * 4 + vnoise(y * 0.8, 5.2) * 1.8;
       for (let x = 0; x < cols; x++) {
         const i = y * cols + x;
         if (!tape[i]) continue;
@@ -420,7 +429,7 @@
 
   function setTarget(v) {
     target = v;
-    if (v > 0.5 && drift <= 0.001) exitDrift = 3.2;
+    if (v > 0.5 && drift <= 0.001) exitDrift = 4.5;
     if (v < 0.5 && drift > exitDrift) drift = exitDrift;
     cv.setAttribute('data-cur', v > 0.5 ? 'etiketi geri yapıştır' : 'etiketi sök');
     if (reduce) { peel = v; drift = v > 0.5 ? exitDrift : 0; render(performance.now()); }
